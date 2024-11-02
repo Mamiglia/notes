@@ -1,6 +1,6 @@
-[[Transformer State Analysis]]
+[[Transformer State]]
 
-[[A Mathematical Framework for Transformer Circuits]]
+[[Mathematical Framework for Transformer Circuits]]
 
 [[Toy Models of Superposition]]
 

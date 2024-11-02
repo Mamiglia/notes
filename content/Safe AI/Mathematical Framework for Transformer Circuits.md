@@ -1,4 +1,10 @@
-[Paper](https://transformer-circuits.pub/2021/framework/index.html)
+---
+title: Mathematical Framework for Transformer Circuits
+tags:
+  - paper
+url: https://transformer-circuits.pub/2021/framework/index.html
+---
+
 
 The paper analyzes the inner circuits of a toy attention-only transformer.
 

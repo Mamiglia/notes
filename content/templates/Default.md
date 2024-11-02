@@ -1,11 +1,11 @@
 ---
 title: <% tp.file.title %>
-description: ""
-date: <% tp.date.now("YYYY-MM-DD") %>
+description: 
+date: <% tp.date.now("DD/MM/YYYY") %>
 tags:
   - unprocessed
-lastmod: <% tp.date.now("YYYY-MM-DD") %>
 status: active/draft
+url:
 ---
 <% tp.file.cursor() %>
 

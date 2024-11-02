@@ -1,3 +1,8 @@
+---
+title: Transformer State
+---
+
+
 I propose to use a novel representation of the transformer state, based on the interaction between keys and values in the context window, to study what the transformer is “thinking”.
 
 $\verb|state|_n = \frac{\sum^n k_i^T v_i}{\sum^n k_i} \in \mathbb{R}^d$

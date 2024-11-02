@@ -1,5 +1,9 @@
-[https://transformer-circuits.pub/2022/toy_model/index.html](https://transformer-circuits.pub/2022/toy_model/index.html)
-
+---
+title: Toy Models of Superposition
+tags:
+  - paper
+url: https://transformer-circuits.pub/2022/toy_model/index.html
+---
 An “ideal” NN model would always map specific neuron activations to specific features of the input. For example the ideal ImageNet would have a specific neuron firing for each cat ear.
 
 We call this phenomenon as **monosemanticity** but we note that it quite rare to observe in any deep neural network. Rather neurons often have a **superposition** of feature activations (**polisemantic**). It’s very common for models to develop such a structure as the authors argue that **superposition** is needed in order to represent more features than the model has dimensions, allowing to compress information into a small set of neurons.

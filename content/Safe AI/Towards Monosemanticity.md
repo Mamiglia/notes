@@ -1,5 +1,9 @@
-[https://transformer-circuits.pub/2023/monosemantic-features/index.html](https://transformer-circuits.pub/2023/monosemantic-features/index.html)
-
+---
+title: Towards Monosemanticity
+tags:
+  - paper
+url: https://transformer-circuits.pub/2023/monosemantic-features/index.html
+---
 In this paper hey propose an approach to separate and interpret the polysemantic neurons of a MLP layer of a transfomer into a set of distinct features.
 
 In particular, given the activations that come out of an MLP layer they train a 2-layer Autoencoder that reconstructs the input vector. What’s different from previous autoencoders is that this time the hidden state is considerably larger than the original vector (8x - 256x). Also they use a L1 loss on the hidden state activations to induce sparsity and reduce the number of active hidden neurons at each step.
@@ -40,3 +44,12 @@ for each of the features and their explanations (context) they try to prove that
 - the feature is _universal_ (it’s found also in other LLMs)
 
 they analyze this on simple to evaluate contexts and features, relating to: base64 strings, DNA code, hebrew and arabic scripts. These are easy as all these contexts are based on specific unicode ranges.
+
+
+```embed
+title: "Google Colab"
+image: "https://colab.research.google.com/img/colab_favicon_256px.png"
+description: "Sign in"
+url: "https://colab.research.google.com/drive/1DSqMihSkocF4WtLtazpIpZoUzrlu3Vdb?usp=sharing"
+```
+
