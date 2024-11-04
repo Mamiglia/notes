@@ -1,8 +1,6 @@
 ---
 title: Homepage
 ---
-Homepage of mamiglia.github.io
+Digital Garden for my Ph.D. notes.
 
-[[Safe AI]]
 
-[[Safe AI/Safe AI]]

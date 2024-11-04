@@ -1,3 +1,7 @@
+---
+title: Bayesian Estimation of Fisher Matrix
+tags: idea
+---
 [![](https://upload.wikimedia.org/wikipedia/commons/3/35/Chi-square_pdf.svg)](https://upload.wikimedia.org/wikipedia/commons/3/35/Chi-square_pdf.svg)
 
 The FIM is a way to attribute parameter importance of a DNN, it’s used transversally in many domains such as _model merging, continual learning, federated learning,_ etc… but for us it’s interesting thanks to the implications in **machine unlearning** and **mechanistic interpretability**.

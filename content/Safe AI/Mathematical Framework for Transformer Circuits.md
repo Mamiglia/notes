@@ -4,8 +4,6 @@ tags:
   - paper
 url: https://transformer-circuits.pub/2021/framework/index.html
 ---
-
-
 The paper analyzes the inner circuits of a toy attention-only transformer.
 
 ### Residual Stream
