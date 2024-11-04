@@ -16,9 +16,9 @@ emulation of sparse networks
 
 They provide 3 different definitions, but finally argue that the one they use is:
 
-Properties of the input which a sufficiently large neural network will reliably dedicate a neuron to representing.
+> Properties of the input which a sufficiently large neural network will reliably dedicate a neuron to representing.
 
-e.g. curve detectors are reliably found in each and every vision model, sentiment detectors are found in any llm, and induction heads are in any sequence model (this kinda reminds me of platonic representation conjecture).
+e.g. curve detectors are reliably found in each and every vision model, sentiment detectors are found in any LLM, and induction heads are in any sequence model (this kinda reminds me of platonic representation conjecture).
 
 They also argue that features are usually represented by directions, for example the famous example:
 
