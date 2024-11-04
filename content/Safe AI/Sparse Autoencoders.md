@@ -34,3 +34,20 @@ They successfully obtain better MSE and $L_0$ loss but when analyzing the featur
 The only explanation they can provide is that the Tanh induces higher frequency components, with very high activation patterns.
 
 ### [Training Strategy](https://www.lesswrong.com/posts/3JuSjTZyMzaSeTxKk/fixing-feature-suppression-in-saes-2#How_can_we_fix_feature_suppression_in_trained_SAEs_)
+They first modify the inner state with a **scale** parameter.
+$$
+z = s \odot ReLU(Wx)
+$$
+Then they test various forms of second-phase of training, in which they finetune the trained model but they freeze a part of the parameters, and remove the penalty.
+![[Pasted image 20241104142818.png]]
+
+They find out that the last three methods (in which they freeze the decoder) greatly reduce feature sparsity (which is undesirable).
+
+They also show that the other methods (freeze the encoder) reduce the MSE, improve perplexity, and increase L2 norm ratio in respect of the input (which is a proxy of feature suppression). Overall they conclude that this training strategy can improve the reconstruction of the features, by reducing feature shrinkage.
+
+### [Gated SAE](https://arxiv.org/pdf/2404.16014)
+
+### [TopK SAE](https://cdn.openai.com/papers/sparse-autoencoders.pdf)
+
+## [Comparison](https://transformer-circuits.pub/2024/june-update/index.html#topk-gated-comparison)
+
