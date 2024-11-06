@@ -3,7 +3,7 @@ title: Transformer State
 tags:
   - idea
 ---
-
+## Idea proposal:
 
 I propose to use a novel representation of the transformer state, based on the interaction between keys and values in the context window, to study what the transformer is “thinking”.
 
@@ -40,9 +40,7 @@ The impact of this research is difficult to guess, as it depends on what do thes
 - Estimating Knowledge from params [https://arxiv.org/pdf/2406.12673](https://arxiv.org/pdf/2406.12673)
 - Representation engineering [https://arxiv.org/abs/2310.01405](https://arxiv.org/abs/2310.01405)
 - Mapping Mind of LLMs [https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html](https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html)
-    - They use SAEs (Sparse Auto-Encoders) to extract monosemantic activations from the polysemantic activations of an LLM.
-- [https://www.alignmentforum.org/posts/NfFST5Mio7BCAQHPA/an-extremely-opinionated-annotated-list-of-my-favourite-1](https://www.alignmentforum.org/posts/NfFST5Mio7BCAQHPA/an-extremely-opinionated-annotated-list-of-my-favourite-1)
-
+    - They use [[Sparse Autoencoders]] to extract monosemantic activations from the polysemantic activations of an LLM.
 ### Datasets
 
 - TruthfulQA
@@ -84,9 +82,15 @@ Static knowledge is embedded in the model parameters.
 
 Where is the dynamic knowledge (like the one acquired at runtime) stored?
 
-  
+## KV Cache
+Storing previous KV pairs would be required in order for this method to work. But, this wouldn't be a problem as it's already common to use a KV cache for inference in production environments. 
 
-**possible issues:**
+Furthermore, if it's the case that the KV cache is more sophisticated, for example it has some hierarchiacal structure or it's pruned based on some importance scores, we could analyze these layered KV cache directly. 
+
+Or maybe we could store the aggregated values of their attention scores. And then use it as a proxy of importance.
+
+
+## Possible Issues
 
 1. This discourse is valid for linear attention, while the transformers we’ll analyze have standard Attention. hopefully this will work the same as we just need to represent the information stored in the Key-Values pairs.
     1. _optionally:_ find $\phi(\cdot)$﻿ such that it better mimics the original $e^{xy}$﻿
