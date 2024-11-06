@@ -20,6 +20,12 @@ In this way they create a LoRA that is focusing only on the target feature and s
 By providing contrastive examples the model should be able to learn a direction in the feature space such that only the desired feature is changed, with less interference on other features.
 
 They show that they're able to learn these LoRA in two cases:
-- from **Textual** queries
-- from **visual** samples
-Plus they use 
+- from **Textual** queries by providing contrastive prompts
+- from **visual** samples by providing contrasting images
+They show that you can also transfer sliders from previous models, by providing visual clues, and to improve image quality (hands, realism) by providing contrastive samples.
+
+Finally they show that these sliders can be composed one onto another (up to 50 befor image degradation) by just summing the LoRA.
+![[Pasted image 20241106111026.png]]
+
+### Inference
+At inference the way they run these methods is that they run the first $t$ steps with the pretrained model and only the last denoising iterations with the changed parameters.
