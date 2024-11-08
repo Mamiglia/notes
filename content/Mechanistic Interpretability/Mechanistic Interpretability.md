@@ -1,5 +1,5 @@
 ---
-title: Safe AI
+title: Mechanistic Interpretability
 tags:
   - homepage
 ---
