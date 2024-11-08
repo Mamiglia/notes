@@ -45,7 +45,7 @@ They find out that the last three methods (in which they freeze the decoder) gre
 
 They also show that the other methods (freeze the encoder) reduce the MSE, improve perplexity, and increase L2 norm ratio in respect of the input (which is a proxy of feature suppression). Overall they conclude that this training strategy can improve the reconstruction of the features, by reducing feature shrinkage.
 
-	### [Gated SAE](https://arxiv.org/pdf/2404.16014)
+### [Gated SAE](https://arxiv.org/pdf/2404.16014)
 
 ### [TopK SAE](https://cdn.openai.com/papers/sparse-autoencoders.pdf)
 
