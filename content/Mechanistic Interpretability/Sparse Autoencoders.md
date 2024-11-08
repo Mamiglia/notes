@@ -46,6 +46,33 @@ They find out that the last three methods (in which they freeze the decoder) gre
 They also show that the other methods (freeze the encoder) reduce the MSE, improve perplexity, and increase L2 norm ratio in respect of the input (which is a proxy of feature suppression). Overall they conclude that this training strategy can improve the reconstruction of the features, by reducing feature shrinkage.
 
 ### [Gated SAE](https://arxiv.org/pdf/2404.16014)
+These have been proposed to address the issues of feature *shrinking* in standard SAEs. They first say that an SAE has two roles:
+- *detects* which features are active
+- *estimates* the magnitude of the active features
+The L1 loss is crucially important for detecting disentangled features, but it's detrimental in the second case in which it's a source of unwanted bias toward 0.
+
+They propose to decompose the model into two parts:
+$$
+\begin{align}
+g(x) &= W_g x + b_g \\
+m(x) &= W_m x + b_m \\
+z(x) &= (g(x) > 0) \odot ReLU(m(x))
+\end{align}
+$$
+In practice they revive Gated Linear Units for this purpose, and they separately estimate the detection and estimation parts. In practice, to avoid doubling the parameters of the encoder they tie the weights of $W_m, W_g$ such that:
+$$
+W_m = \exp(r_m) W_g 
+$$ Such that they share the same vector direction but have different norms and biases, so at the end they have $2h$ additional parameters. The result is that in practice this is equivalent to using a jump ReLU, where the $\theta$ can be learned and is $\theta = b_m - \exp(r_m)\odot b_g$.
+<img src="https://res.cloudinary.com/lesswrong-2-0/image/upload/f_auto,q_auto/v1/mirroredImages/wZqqQysfLrt2CFx4T/zzrdot3xexvcz3mqghn8" alt="jump relu" width="400"/>
+
+Then at runtime we use the following training loss:
+$$
+\mathcal{L} = \mathcal{L}_\text{MSE} +\lambda||\verb|ReLU|(\pi)||_1 + ||x-\verb|dec|_\text{frozen}(ReLU(\pi))||_2^2
+$$
+- the first term is the **reconstruction loss**.
+- The second is the penalization of the activations, which is needed to induce sparsity. Note that we cannot use the step function $(\cdot > 0)$ because it's not differentiable, so we use ReLU
+- Finally the last term is an auxiliary loss that tries to reconstruct $x$ but considering only the detected features. Note that in this step we freeze the decoder to avoid passing gradient there. (why not $ReLU(\pi) \odot ReLU(m)$?)
+
 
 ### [TopK SAE](https://cdn.openai.com/papers/sparse-autoencoders.pdf)
 
