@@ -75,6 +75,13 @@ $$
 
 
 ### [TopK SAE](https://cdn.openai.com/papers/sparse-autoencoders.pdf)
+TopK SAE work by zeroing out all the non top-k activations. 
+$$
+\hat{z} = \text{Top-k}(z)
+$$
+In this way only the top-k activations are kept and this enforces a specific $L_0$ sparsity on the autoencoder. During training in fact it's unnecessary to use the $L_1$ penalty, and thus they avoid the issue of activation shrinkage.
 
+Enforcing a specific $L_0$ could be handy, as it avoids retraining different models until we find a desired sparsity, but it's suboptimal.
 ## [Comparison](https://transformer-circuits.pub/2024/june-update/index.html#topk-gated-comparison)
-
+By comparing the Gated SAE with the Top-K and standard ones it turns out that the both Gated and TopK are a pareto improvement over the standard SAE. 
+![[SAE-comparison.png]]When comparing different SAE methods it's important to also look at the interpretability of the features found as $L_0$ and MSE are only proxies of what we actually are looking for, interpretable features, in this case both Gated and Top-K find features that are as interpretable as in the standard SAEs.

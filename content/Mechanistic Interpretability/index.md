@@ -23,28 +23,3 @@ Clock and the Pizza
 [https://arxiv.org/abs/2311.12092](https://arxiv.org/abs/2311.12092)
 
 Chiedi di anomaly detection
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-- **OLD ideas**
-    
-    [[Bayesian Estimation of Fisher Matrix]]
-    
-    |**name**|**fields**|**pros**|**cons**|**impact**|
-    |---|---|---|---|---|
-    |Transformer State|representation engineering|completely novel approach to representation reading|needs to be validated on big LLMs|from none to foundational (based on how much information is actually encoded in the state)|
-    |Bayes Fisher Information Matrix|machine unlearning, importance attribution|lightweight experiments, we can always just add more bayesian theory if things don’t work out||incremental improvement on an already widespread technique|
-    
-    [[GFlowNet]]

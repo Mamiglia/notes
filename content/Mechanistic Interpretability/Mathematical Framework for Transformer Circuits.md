@@ -14,7 +14,7 @@ The residual stream is high dimensional, while the operations in the layers are 
 
 **What is the purpose of Attention Heads?** it can be interpreted as moving information from one token to another, thanks to the attention map mechanism. In fact, the attention map decides which tokens to attend, and transfers information form those tokens in another residual stream (note: there’s one residual stream per token).
 
-![[Untitled.png]]
+![[SAE-comparison.png]]
 
 ### **Zero-Layer Transformer**
 
