@@ -18,4 +18,6 @@ The interesting part is the way in which they perform the analysis. In fact at f
 - **gradients**: They would have expected the gradients to be asymmetrical.
 - **logits**: They don't find correlation between the logits and $a-b$, which would be expected.
 
-Prompted by these results they perform a deeper analysis and find the alternative results  
+Prompted by these results they perform a deeper analysis and find the alternative Pizza algorithm. 
+
+### Key Takeaway

@@ -10,7 +10,9 @@ The idea we propose is this one: [[Transformer State]]. Here's a list of relevan
 - Introduction analysis on SAEs[[Towards Monosemanticity]]
 	- New SAE architectures: [[Sparse Autoencoders]]
 
-  
+$$
+x = s
+$$  
 
 [Nanda's list of papers](https://www.alignmentforum.org/posts/NfFST5Mio7BCAQHPA/an-extremely-opinionated-annotated-list-of-my-favourite-1#comments)
 
