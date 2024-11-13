@@ -7,7 +7,6 @@ tags:
 status: active/draft
 url: https://arxiv.org/abs/2306.17844
 ---
-\
 This paper analyzes algorithmic discovery in neural networks and how it can differ. The task at hand is modular addition, given $a, b$ and fixed $p$ it computes:
 $$
 (a+b)\%p
@@ -22,3 +21,4 @@ The interesting part is the way in which they perform the analysis. In fact at f
 Prompted by these results they perform a deeper analysis and find the alternative Pizza algorithm. 
 
 ### Key Takeaway
+You can analyze gradients and logits to discern different behaviours of the models. Also it's not always obvious which algorithm is the model implementing, as it can vary unexpectedly based on the shape of the network.
