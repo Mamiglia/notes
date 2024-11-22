@@ -7,7 +7,7 @@ tags:
 
 I propose to use a novel representation of the transformer state, based on the interaction between keys and values in the context window, to study what the transformer is “thinking”.
 
-$\verb|state|_n = \frac{\sum^n k_i^T v_i}{\sum^n k_i} \in \mathbb{R}^d$
+$$\verb|state|_n = \frac{\sum^n k_i^T v_i}{\sum^n k_i} \in \mathbb{R}^d$$
 
 This is part of the **representation engineering** field, and hopefully this novel representation of the state should contain more information than just the record of activations, possibly containing all the **dynamic** information that the model has acquired in the last context window. Once we apply anomaly detection techniques over these states, we should be able to understand some inner mechanisms:
 
