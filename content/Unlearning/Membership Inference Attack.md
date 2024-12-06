@@ -35,3 +35,11 @@ Since we often don't have access to the model parameters and/or original trainin
 ### MIA for Machine Unlearning
 When you apply MIA to Machine Unlearning the setting is a bit difficult. In this case you want to verify whether your model forgot about some specific samples (*forget set*). In this case you train the MIA to distinguish the model behaviour between *validation set* and *retain set*, then to test the performance of your unlearning you hope that as much as possible of your *forget set* get classified as non-member. 
 
+Of course you first need to have a sufficiently working MIA (how to assess this?) and the performance as the target is:
+$$ 
+MIA_\theta(\text{member} | \mathcal{D}_f) \sim 
+MIA_\theta(\text{member} | \mathcal{D}_t)
+$$
+
+
+
