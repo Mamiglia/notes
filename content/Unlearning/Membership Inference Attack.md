@@ -16,7 +16,7 @@ For example the input features of a MIA could be:
 And the classifier could be any ML model, but I've seen that most of the people use very simple models like Logistic Regression, SVC, or other classical ML techniques.
 
 ### Theoretical Best
-The 
+As I understand it (although this is not mentioned elsewhere) what we actually search through the MIA is whether the pos
 ### Shadow Models
 Since we often don't have access to the model parameters and/or original training set, you typically train a number of similar models on similar datasets, and train your **MIA** over these shadow models. Then you apply it over the features extracted from the original model. 
 
