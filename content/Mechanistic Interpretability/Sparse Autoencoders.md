@@ -52,6 +52,7 @@ These have been proposed to address the issues of feature *shrinking* in standar
 The L1 loss is crucially important for detecting disentangled features, but it's detrimental in the second case in which it's a source of unwanted bias toward 0.
 
 They propose to decompose the model into two parts:
+
 $$
 \begin{align}
 g(x) &= W_g x + b_g \\
