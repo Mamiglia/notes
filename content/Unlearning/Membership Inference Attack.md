@@ -9,14 +9,20 @@ url:
 The **MIA** is a technique used to infer whether a specific sample was used or not in the training process of a model. Every MIA technique works by extracting some features about the **model behaviour** from a forward pass where the input is the candidate sample. Then we can fit a classifier to try to infer whether the sample was a member of the training set.
 
 For example the input features of a MIA could be:
-- **Logits**
-- **Entropy**
-- **Confidence**
-- **Loss**
+- **Logits**: 
+- **Entropy**: 
+- **Confidence**: 
+- **Loss**: 
 And the classifier could be any ML model, but I've seen that most of the people use very simple models like Logistic Regression, SVC, or other classical ML techniques.
 
 ### Theoretical Best
-As I understand it (although this is not mentioned elsewhere) what we actually search through the MIA is whether the pos
+As I understand it (although this is not mentioned elsewhere) what we actually search through the MIA is whether some behaviour of the model could let us infer the membership of the samples. As such what we are searching is actually a measure of the information that the features extracted $X$ give us on the $Y \sim Bern(p)$ membership, as $X \stackrel{\text{I}}{\rightarrow} Y$. 
+
+The theoretical maximum in this case is the *Bayes Error Rate*, which is the irreducible error of a perfect classifier. Though this is impossible to compute, we can approximate it with:
+- [Mutual Information](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mutual_info_score.html)
+- [Informedness (Youden's J)](https://en.wikipedia.org/wiki/Youden%27s_J_statistic)
+- Balanced Accuracy
+And of course we would like to minimize them, to have the most 
 ### Shadow Models
 Since we often don't have access to the model parameters and/or original training set, you typically train a number of similar models on similar datasets, and train your **MIA** over these shadow models. Then you apply it over the features extracted from the original model. 
 
