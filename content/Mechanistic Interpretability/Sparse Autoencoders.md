@@ -63,13 +63,15 @@ $$
 In practice they revive Gated Linear Units for this purpose, and they separately estimate the detection and estimation parts. In practice, to avoid doubling the parameters of the encoder they tie the weights of $W_m, W_g$ such that:
 $$
 W_m = \exp(r_m) W_g 
-$$ Such that they share the same vector direction but have different norms and biases, so at the end they have $2h$ additional parameters. The result is that in practice this is equivalent to using a jump ReLU, where the $\theta$ can be learned and is $\theta = b_m - \exp(r_m)\odot b_g$.
+$$
+Such that they share the same vector direction but have different norms and biases, so at the end they have $2h$ additional parameters. The result is that in practice this is equivalent to using a jump ReLU, where the $\theta$ can be learned and is $\theta = b_m - \exp(r_m)\odot b_g$.
 <img src="https://res.cloudinary.com/lesswrong-2-0/image/upload/f_auto,q_auto/v1/mirroredImages/wZqqQysfLrt2CFx4T/zzrdot3xexvcz3mqghn8" alt="jump relu" width="400"/>
 
 Then at runtime we use the following training loss:
 $$
 \mathcal{L} = \mathcal{L}_\text{MSE} +\lambda||\verb|ReLU|(\pi)||_1 + ||x-\verb|dec|_\text{frozen}(ReLU(\pi))||_2^2
 $$
+
 - the first term is the **reconstruction loss**.
 - The second is the penalization of the activations, which is needed to induce sparsity. Note that we cannot use the step function $(\cdot > 0)$ because it's not differentiable, so we use ReLU
 - Finally the last term is an auxiliary loss that tries to reconstruct $x$ but considering only the detected features. Note that in this step we freeze the decoder to avoid passing gradient there. (why not $ReLU(\pi) \odot ReLU(m)$?)
