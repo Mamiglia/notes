@@ -42,9 +42,12 @@ $$
 
 A metric that could give us a full picture over the MIA and also include the performance of the attack is:
 $$
-\log \frac{P_\theta(\text{member} | D_f)}{P_\theta(\text{member} | D_r)}
+\psi = \frac{P_\theta(\text{member} | D_f)}{P_\theta(\text{member} | D_r)}
 $$
-
+Which tells us how much likely is the MIA going to predict that the forget sample is a member compared to how much it would predict that a sample belonging to the train set is a member (True Positive Ratio).
+- $\psi > 1$ means that the MIA still detects the forget samples as part of the training set
+- $\psi = 1$ means that the forget procedure didn't have a meaningful impact on the model
+- $\psi < 1$ means that the forget procedure did change something in the behaviour of the model that is capable of tricking the MIA. $\psi$ is proportional to the ability of the forget procedure of tricking the MIA. 
 
 
 
