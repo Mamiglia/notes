@@ -23,11 +23,16 @@ In general it can be said that the more the model has memorized the training set
 As I understand it (although this is not mentioned elsewhere) what we actually search through the MIA is whether some behaviour of the model could let us infer the membership of the samples. As such what we are searching is actually a measure of the information that the features extracted $X$ give us on the $Y \sim Bern(p)$ membership, as $X \stackrel{\text{I}}{\rightarrow} Y$. 
 
 The theoretical maximum in this case is the *Bayes Error Rate*, which is the irreducible error of a perfect classifier. Though this is impossible to compute, we can approximate it with:
-- [Mutual Information](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mutual_info_score.html)
+- [Mutual Information](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mutual_info_score.html
 - Balanced Accuracy
 - [Informedness (Youden's J)](https://en.wikipedia.org/wiki/Youden%27s_J_statistic): rescaled balanced accuracy
 
 In order to have the most private model these metrics should be as low as possible, i.e. the information that $X$ gives us over $Y$ should be as low as possible.
+
+#### Actually
+Actually this [paper](LiRA) (which also is the current SotA) for MIA says that rather than using aggregated/average metrics we should look at the behaviour of the model at the extremes. In practice this means that you should evaluate your model by computing the TPR at low fixed thresholds of the FPR. 
+
+This would give you the ability of a
 
 ### Shadow Models
 Since we often don't have access to the model parameters and/or original training set, you typically train a number of similar models on similar datasets, and train your **MIA** over these shadow models. Then you apply it over the features extracted from the original model. 
@@ -40,6 +45,7 @@ $$
 \text{MIA-efficacy} = P_\theta(\text{not-member} | D_f)
 $$
 
+#### my idea
 A metric that could give us a full picture over the MIA and also include the performance of the attack is:
 $$
 \psi = \frac{P_\theta(\text{member} | D_f)}{P_\theta(\text{member} | D_r)}
@@ -50,4 +56,5 @@ Which tells us how much likely is the MIA going to predict that the forget sampl
 - $\psi < 1$ means that the forget procedure did change something in the behaviour of the model that is capable of tricking the MIA. $\psi$ is proportional to the ability of the forget procedure of tricking the MIA. 
 
 
-
+#### Others
+Look into this: https://arxiv.org/pdf/2405.19211
