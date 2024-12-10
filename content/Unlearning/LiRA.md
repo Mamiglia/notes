@@ -24,4 +24,11 @@ In order to have a puntual metric they fix some values of FPR (e.g. FPR=0.01%) a
 - **TPR@FPR=k%**: means the probability of correct member classification when the model is (1-k)% confident, i.e. the number of correct positive predictions the model is highly  confident in.
 
 ## Method
-The paper also propose a method for performing MIA named **Likelihood Ratio Attack (LiRA)** which is 
+The paper also propose a method for performing MIA named **Likelihood Ratio Attack (LiRA)**. The method works as such:
+- fit a gaussian distribution on the features of the members
+- fit a gaussian distribution on the features of non-members
+- compute the likelihood ratio.
+
+I don't really get why this should be more effective than SVC or LogisticRegression since this looks like Naive Bayes.
+
+As features they use a "logit scaling" of the loss
