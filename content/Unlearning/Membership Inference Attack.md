@@ -30,7 +30,7 @@ The theoretical maximum in this case is the *Bayes Error Rate*, which is the irr
 In order to have the most private model these metrics should be as low as possible, i.e. the information that $X$ gives us over $Y$ should be as low as possible.
 
 #### Actually
-Actually this [paper](LiRA) (which also is the current SotA) for MIA says that rather than using aggregated/average metrics we should look at the behaviour of the model at the extremes. In practice this means that you should evaluate your model by computing the TPR at low fixed thresholds of the FPR. 
+Actually this [paper](LiRA.md) (which also is the current SotA) for MIA says that rather than using aggregated/average metrics we should look at the behaviour of the model at the extremes. In practice this means that you should evaluate your model by computing the TPR at low fixed thresholds of the FPR. 
 
 This would give you the ability of a
 
