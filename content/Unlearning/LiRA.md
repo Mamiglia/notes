@@ -31,4 +31,8 @@ The paper also propose a method for performing MIA named **Likelihood Ratio Atta
 
 I don't really get why this should be more effective than SVC or LogisticRegression since this looks like Naive Bayes.
 
-As features they use a "logit scaling" of the loss, which is equal to taking the log odds of the probability.
+As features they use a "logit scaling" of the loss, which is equal to taking the log odds of the probability. Otherwise when the logits are availiable they use a kind of hinge loss (which can be proved to be the same thing).
+
+$$
+l(x,y) = z(x)_y - \max_{y' \neq y} z(x)_{y'}
+$$
