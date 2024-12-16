@@ -36,3 +36,6 @@ As features they use a "logit scaling" of the loss, which is equal to taking the
 $$
 l(x,y) = z(x)_y - \max_{y' \neq y} z(x)_{y'}
 $$
+
+
+[implementation](https://github.com/tensorflow/privacy/blob/master/research/mi_lira_2021/score.py)
