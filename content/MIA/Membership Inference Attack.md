@@ -1,7 +1,7 @@
 ---
 title: Membership Inference Attack
 description: 
-date: 06/12/2024
+date: 2024-12-18
 tags:
   - summary
 url:
