@@ -47,3 +47,4 @@ In the [SHIFT](https://arxiv.org/abs/2403.19647) method they search among the SA
 In SAE bench they automate this process by training two linear classifiers, and then measuring the accuracy in a biased vs unbiased setting
 
 ### Targeted Probe Perturbation
+Similar to SHIFT they use any multinomial classification NLP dataset to train a linear classifier on the sparse features found by the SAE. They 
