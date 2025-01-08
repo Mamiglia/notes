@@ -28,4 +28,10 @@ For the [HumanAct12](https://drive.google.com/drive/folders/1TBY2x-gD6f3yzQ0WNmX
 ## [MotionX](https://motion-x-dataset.github.io/)
 MotionX is the union of multiple datasets (including AMASS) of SMPL-X motions. It was obtained by aggregating datasets, scraping online videos and doing pose-estimation, or face/hands estimation in those datasets in which it was missing.
 
-It appears that it doesn't provide any information about gender or subject ID, but it may depend on the single datasets that compose it.
+It appears that it doesn't provide any information about gender or subject ID, but it may depend on the single datasets that compose it. 
+
+
+### Estimating Attributes
+Since these datasets are so scarce of metadata we might want to estimate the actors' attributes, as it seems that you can estimate body attributes from SMPL data (height, gender, weight, etc...?), using [SHAPY](https://shapy.is.tue.mpg.de/).
+
+Otherwise we can replicate their data pipeline and try to keep the metadata intact, for those datasets that have them available.
