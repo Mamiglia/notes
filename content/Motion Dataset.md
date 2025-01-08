@@ -8,11 +8,8 @@ tags:
   - summary
 url:
 ---
-## [MotionX](https://motion-x-dataset.github.io/)
-
-
 ## [HumanML3D]()
-HumanML3D is a 3D human motion-language dataset that originates from a combination of [HumanAct12](https://github.com/EricGuo5513/action-to-motion) and [Amass](https://github.com/EricGuo5513/action-to-motion) dataset. It covers a broad range of human actions such as daily activities (e.g., 'walking', 'jumping'), sports (e.g., 'swimming', 'playing golf'), acrobatics (e.g., 'cartwheel') and artistry (e.g., 'dancing').
+HumanML3D is a 3D human motion-language dataset that originates from a combination of [HumanAct12](https://github.com/EricGuo5513/action-to-motion) and [Amass](https://github.com/nghorbani/amass/tree/master) dataset. It covers a broad range of human actions such as daily activities (e.g., 'walking', 'jumping'), sports (e.g., 'swimming', 'playing golf'), acrobatics (e.g., 'cartwheel') and artistry (e.g., 'dancing').
 
 Each motion clip in HumanML3D comes with 3-4 single sentence descriptions annotated on Amazon Mechanical Turk. Motions are downsampled into 20 fps, with each clip lasting from 2 to 10 seconds.
 
@@ -20,6 +17,15 @@ Overall, HumanML3D dataset consists of **14,616** motions and **44,970** descrip
 
 In order to obtain the dataset you need to clone the repo and run their code to process Amass dataset (they cannot distribute it directly).
 
-For every motion we also know:
+AMASS is the union of 25 motion datasets. It can be downloaded after agreeing with the license. For each motion we know:
 - the gender
-- Subject ID
+
+For the [HumanAct12](https://drive.google.com/drive/folders/1TBY2x-gD6f3yzQ0WNmXP2-be3xu3qDkV) we know:
+- The subject ID (12 total actors)
+- group ID
+- repetition number 
+
+## [MotionX](https://motion-x-dataset.github.io/)
+MotionX is the union of multiple datasets (including AMASS) of SMPL-X motions. It was obtained by aggregating datasets, scraping online videos and doing pose-estimation, or face/hands estimation in those datasets in which it was missing.
+
+It appears that it doesn't provide any information about gender or subject ID, but it may depend on the single datasets that compose it.
