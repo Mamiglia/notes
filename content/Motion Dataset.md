@@ -20,3 +20,6 @@ Overall, HumanML3D dataset consists of **14,616** motions and **44,970** descrip
 
 In order to obtain the dataset you need to clone the repo and run their code to process Amass dataset (they cannot distribute it directly).
 
+For every motion we also know:
+- the gender
+- Subject ID
