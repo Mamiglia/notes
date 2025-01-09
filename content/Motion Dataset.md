@@ -24,7 +24,8 @@ For the [HumanAct12](https://drive.google.com/drive/folders/1TBY2x-gD6f3yzQ0WNmX
 - The subject ID (12 total actors)
 - group ID
 - repetition number 
-
+- This dataset is not annotated in natural language, rather there's a categorical amount of actions.
+![[Pasted image 20250109164525.png]]
 ## [MotionX](https://motion-x-dataset.github.io/)
 MotionX is the union of multiple datasets (including AMASS) of SMPL-X motions. It was obtained by aggregating datasets, scraping online videos and doing pose-estimation, or face/hands estimation in those datasets in which it was missing.
 
