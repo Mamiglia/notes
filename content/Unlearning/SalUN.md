@@ -2,6 +2,7 @@
 title: SalUN
 tags:
   - paper
+url: https://arxiv.org/abs/2310.12508
 ---
 ## Discoveries about codebase
 The codebase is divided in three sections:
