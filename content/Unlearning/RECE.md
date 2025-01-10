@@ -4,7 +4,7 @@ description:
 date: 10/01/2025
 tags:
   - paper
-url:
+url: http://arxiv.org/abs/2407.12383
 ---
 RECE proposes a zero-shot method for unlearning concepts from T2I models. They do so by iteratively applying a closed-form matrix alignment method.
 
