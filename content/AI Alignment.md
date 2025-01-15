@@ -20,4 +20,5 @@ Misalignment problems is usually broke down in two subtasks:
 - **Outer Misalignment** refers to the complexity of expressing an ideal goal into a defined set of precise rules.
 - **Inner Misalignment** refers instead to the gaming that an AI system could apply to a given proxy goal distill an internal goal.
 
++
 
