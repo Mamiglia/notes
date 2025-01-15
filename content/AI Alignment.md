@@ -36,3 +36,10 @@ RLHF is a very useful technique that allows us to align models with human behavi
 - **Human feedback has issues**: The human annotators are not perfect and they might pass biases and issues of the annotators onto the model. Also as the models become more complex the outputs of the model might become too complicated to evaluate.
 - **The model is still susceptible to attacks**: The model can still be jailbroken, and open-weights models conditioning can be removed with just a little parameter editing.
 
+## Scalable Oversight
+
+### [Weak to Strong generalization](https://cdn.openai.com/papers/weak-to-strong-generalization.pdf)
+Weak to strong generalisation is an empirical approach to learn how larger models generalise when trained by feedback from weaker supervisors. These experiments might help us predict how superhuman models might generalise when trained by feedback from humans, as well as how even more advanced models might generalise from superhuman models, and so on.
+
+
+
