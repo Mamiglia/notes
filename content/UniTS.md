@@ -23,7 +23,7 @@ UniTS was trained simultaneously on multiple tasks.
 - **Forecasting**: they append *GEN* tokens to the end of the sequence to indicate that the model needs to fill them.
 - **Imputation**: they mask tokens in the middle of the sequence with *GEN* tokens
 - **Classification**: They append one *CLS* token at the end of the sequence. After processing they compare the similarity between the outcome of the *CLS* and learned class embeddings (equivalent to one linear layer).
-- **Anomaly Detection**: they use reconstruction error on *GEN* tokens (ask Aurora).  
+- **Anomaly Detection**: they use reconstruction error on *GEN* tokens.
 
 ### Datasets
 UniTS was trained on a diverse set of 38 time series datasets across various domains, including human activity sensors, healthcare, engineering, and finance.
@@ -71,3 +71,8 @@ UniTS was trained on a diverse set of 38 time series datasets across various dom
 37. **SharePriceIncrease**: Contains financial data for predicting stock price increases.
 38. **AbnormalHeartbeat**: Includes ECG data for detecting abnormal heartbeats.
 
+
+### Models
+- **UniTS-ST**: Models trained from scratch for each single task. They prove that UniTS architecture is effective at capturing time-series.
+- **UniTS-SUP**: A single model trained simultaneously on all the tasks and datasets. 
+- **UniTS-PMT**: A frozen version of UniTS-SUP with the prompt tokens finetuned on the specific task/dataset.
