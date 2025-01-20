@@ -65,11 +65,6 @@ UniTS was trained on a diverse set of 38 time series datasets across various dom
 31. **WalkingSittingStanding**: Contains sensor data for classifying walking, sitting, and standing activities.
 32. **Multivariate2018_ts**: A collection of multivariate time series data for classification tasks.
 33. **Univariate2018_ts**: A collection of univariate time series data for classification tasks.
-34. **Blink**: Contains time series data for classifying eye blink events.
-35. **MotionSenseHAR**: Includes sensor data for human activity recognition.
-36. **EMOPain**: Focuses on classifying emotional pain levels from physiological signals.
-37. **SharePriceIncrease**: Contains financial data for predicting stock price increases.
-38. **AbnormalHeartbeat**: Includes ECG data for detecting abnormal heartbeats.
 
 
 ### Models
