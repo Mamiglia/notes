@@ -25,6 +25,9 @@ In order to find how and why this happens inside the model the authors use a **d
 
 They find that by applying this method they can control the behaviour of the model, inducing it in refusing harmless requests and comply with harmful requests.
 
-They also propose a weight modification based on the zero-out method of the latent dimension that modifies directly the model's weights to 
+They also propose a weight modification based on the zero-out method of the latent dimension that modifies directly the model's weights to produce a jailbreaked model which doesn't refuse any question, while still being useful.
+
+### What is jailbreak?
+The authors also check the impact of classical jailbreaking method *Adversarial Suffix Attack* on the found refusal direction. In particular they notice that when the Adversarial suffix is appended to the harmful requests it hijacks the attention map of the model and redirects the attention onto the nonsensical suffix, rather than the prompt itself. 
 
 
