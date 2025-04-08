@@ -6,5 +6,5 @@ tags:
   - paper
 url:
 ---
-This paper finds a simple way to reverse unlearning in LLMs by simply applying weight 
+This paper finds a simple way to reverse unlearning in LLMs by simply applying weight quantization.
 
