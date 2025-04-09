@@ -28,6 +28,7 @@ Top-5 Accuracy: 0.9130
 ![[cm_minconv.png]]
 
 ![[Pasted image 20250409141348.png]]
+![[Pasted image 20250409163018.png]]![[Pasted image 20250409163026.png]]
 ## MinMatch
 Thinking about MinConv, I realized that the metric doesn't consider the sequence in any way. In fact by computing a "Sliding subtraction" we're actually computing the subtraction between every element of $a$ and $b$ and taking the minimum for each of the indices of $a$. 
 At this point it's more straightforward to compute the whole difference matrix (L1 distance) and just take the column-wise minimum.
@@ -53,4 +54,4 @@ Top-5 Accuracy: 0.9130
 ```
 ![[Pasted image 20250409141306.png]]
 
-![[Pasted image 20250409141323.png]]
+![[Pasted image 20250409141323.png]]![[Pasted image 20250409163409.png]]
