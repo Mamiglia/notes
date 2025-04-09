@@ -26,6 +26,8 @@ Top-5 Accuracy: 0.9130
 ================================================
 ```
 ![[cm_minconv.png]]
+
+![[Pasted image 20250409141348.png]]
 ## MinMatch
 Thinking about MinConv, I realized that the metric doesn't consider the sequence in any way. In fact by computing a "Sliding subtraction" we're actually computing the subtraction between every element of $a$ and $b$ and taking the minimum for each of the indices of $a$. 
 At this point it's more straightforward to compute the whole difference matrix (L1 distance) and just take the column-wise minimum.
@@ -34,4 +36,21 @@ $$
 MinMatch(a,b) = \sum_{i\leq n} \min_{j\leq m} |a_i-b_j|
 $$
 
-This gives you the minimum distance between each element of $a$ and $b$ 
+This gives you the minimum distance between each element of $a$ and $b$. We then take the minimum for each element of $a$, and sum (or avg.) the remaining elements.
+
+### Analysis
+This metric is quite fast to compute and results are similar to MinConv, and it outperforms for fragments.
+
+```
+================================================
+    RANKING METRICS REPORT on CHM13 vs HAP1
+================================================
+
+--- ACCURACY METRICS ---
+Top-1 Accuracy: 0.8261
+Top-3 Accuracy: 0.8696
+Top-5 Accuracy: 0.9130
+```
+![[Pasted image 20250409141306.png]]
+
+![[Pasted image 20250409141323.png]]
