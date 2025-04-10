@@ -47,7 +47,7 @@ They also play around with a 2 dimensional model, trying to understand when a mo
 2. Store a feature in superposition
 3. Don’t store a feature
 
-![[toy_models-phase_change.png|toy_models-phase_change.png]]
+![[toy_models-phase_change 1.png|toy_models-phase_change 1.png]]
 
 As expected sparsity is necessary to superposition occurrence, note that in the red area (superposition) the model loses the ability of representing both features at the same time, i.e. the model can successfully retrieve cases in which x = [1 0] and cases of x = [0 1],but is unable to guess x = [1 1]. This is intuitive as we have this behaviour only for high sparsity, thus when [1 1] is unlikely to happen.
 
