@@ -46,11 +46,11 @@ They also play around with a 2 dimensional model, trying to understand when a mo
 2. Store a feature in superposition
 3. Don’t store a feature
 
-![[Untitled 1 2.png|Untitled 1 2.png]]
+![[toy_models-phase_change.png|toy_models-phase_change.png]]
 
-As expected sparsity is necessary to superposition occurrence, note that in the red area (superposition) the model loses the ability of representing both features at the same time, i.e. the model can succesfully retrieve cases in which x = [1 0] and cases of x = [0 1],but is unable to guess x = [1 1]. This is intuitive as we have this behaviour only for high sparsity, thus when [1 1] is unlikely to happen.
+As expected sparsity is necessary to superposition occurrence, note that in the red area (superposition) the model loses the ability of representing both features at the same time, i.e. the model can successfully retrieve cases in which x = [1 0] and cases of x = [0 1],but is unable to guess x = [1 1]. This is intuitive as we have this behaviour only for high sparsity, thus when [1 1] is unlikely to happen.
 
-**Geometry** they explore the geometry of the features discover that the model tends to learn **antipodes** (2 features in 1 dimension) i.e. couples of features packed together. They also see that when they increase the saparsity the model starts assigning features to regular polytopes, i.e. regular structures such as triangles (3 features reprented in 2 dimensions), pentagons (5 in 2), or even square antiprism (8 in 3). These are solutions to the Thomson problem (i don’t know what it is).
+**Geometry** they explore the geometry of the features discover that the model tends to learn **antipodes** (2 features in 1 dimension) i.e. couples of features packed together. They also see that when they increase the sparsity the model starts assigning features to regular polytopes, i.e. regular structures such as triangles (3 features represented in 2 dimensions), pentagons (5 in 2), or even square antiprism (8 in 3). These are solutions to the Thomson problem (i don’t know what it is).
 
 Unfortunately this is only true in uniform settings (all the features are indep. and have the same sparsity and importance). But still they hypot. that in non-uniform settings you get squished polytopes.
 
@@ -58,7 +58,7 @@ Unfortunately this is only true in uniform settings (all the features are indep.
 
 **Correlation:** they show that correlated features tend to be on orthogonal vectors if possible, otherwise they are positively correlating, otherwise they are collapsed in their main principal component.
 
-**Learning Dyanmics:** they show that while learning the model has some issues while trying to change its geometry from one structure to another. In fact the loss has some sorts of “energy jumps” between one geometry and the other. Also they show the trajectory of evolution, showing that the model first learns a PCA-like detector, then transforms it into some other regular polytope.
+**Learning Dynamics:** they show that while learning the model has some issues while trying to change its geometry from one structure to another. In fact the loss has some sorts of “energy jumps” between one geometry and the other. Also they show the trajectory of evolution, showing that the model first learns a PCA-like detector, then transforms it into some other regular polytope.
 
 **Operations in Superposition:** they show that the toy model is capable of performing operations with features in superposition, and they argue that this capability is very powerful, also maybe related to grokking.
 
