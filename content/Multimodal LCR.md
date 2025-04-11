@@ -1,3 +1,4 @@
+**Latent Code Replacement** (LCR) is a technique we developed to erase knowledge in generative models, to steer generation from toxic concepts. 
 ## Process
 - [ ] Read existing literature
 - [ ] Review SotA VQ-VAE generative models
@@ -29,8 +30,6 @@ Foundational papers on VQ-VAE architecture.
 ### Generative Models
 Here's a list of generative models that use VQ-VAE (or variations). We can apply LCR to one or more of these models.
 - [MoMask](https://arxiv.org/abs/2312.00063): Motion forecasting model with RVQ-VAE
-- [Janus-Pro]: Multimodal model that uses VQ-VAE (but I didn't understand where)
-- [Sesame](): Conversational Speech Model (yes people do porn also with [this](https://www.reddit.com/r/ChatGPTJailbreak/comments/1j3ztk3/sesame_jailbreak_update/))
-- ??? Fill-in 
-## Generative Models
-- [Janus-Pro](https://github.com/deepseek-ai/Janus/tree/main):
+- [Janus-Pro](https://github.com/deepseek-ai/Janus/tree/main): Multimodal model that uses VQ-VAE (but I didn't understand where)
+- [Sesame](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice): Conversational Speech Model (yes people do porn also with [this](https://www.reddit.com/r/ChatGPTJailbreak/comments/1j3ztk3/sesame_jailbreak_update/))
+- ??? Fill-in with other VQ-VAE models that are SotA (or almost SotA) in their field. 
