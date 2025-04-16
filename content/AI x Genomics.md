@@ -55,3 +55,8 @@ Top-5 Accuracy: 0.9130
 ![[Pasted image 20250409141306.png]]
 
 ![[Pasted image 20250409141323.png]]![[Pasted image 20250409163409.png]]
+
+## ToDo
+- Prova Jaccard
+- Evo2
+- Prova non-centromeri (solo se hai tempo)
