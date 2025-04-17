@@ -56,6 +56,21 @@ Top-5 Accuracy: 0.9130
 
 ![[Pasted image 20250409141323.png]]![[Pasted image 20250409163409.png]]
 
+
+## Jaccard
+
+```
+==================================================
+               RANKING METRICS REPORT
+==================================================
+
+--- ACCURACY METRICS ---
+Top-1 Accuracy: 1.0000
+Top-3 Accuracy: 1.0000
+Top-5 Accuracy: 1.0000
+```
+![[Pasted image 20250417161744.png]]
+
 ## ToDo
 - Prova Jaccard
 - Evo2
