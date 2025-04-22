@@ -56,6 +56,10 @@ Top-5 Accuracy: 0.9130
 
 ![[Pasted image 20250409141323.png]]![[Pasted image 20250409163409.png]]
 
+### On non-centromeric regions
+![[cm_2mb_minl1_noncentr.png]]
+![[cm_100kb_minl1_noncentr.png]]
+
 
 ## Jaccard
 
@@ -71,7 +75,8 @@ Top-5 Accuracy: 1.0000
 ```
 ![[Pasted image 20250417161744.png]]
 
-## ToDo
-- Prova Jaccard
-- Evo2
-- Prova non-centromeri (solo se hai tempo)
+![[Pasted image 20250422120538.png]]
+![[Pasted image 20250422120552.png]]
+![[Pasted image 20250422120559.png]]
+### Non centromeric regions
+![[cm_2mb_jaccard_noncentr.png]] ![[cm_100kb_jaccard_noncentr.png]] 
