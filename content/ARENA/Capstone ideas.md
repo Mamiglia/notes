@@ -24,7 +24,16 @@ recycle an SAE trained on $x$ to also check out what's happening with $q = M x =
 - LayerNorm actually screws things up
 - I don't like to rely on SAE to interpret as they might not capture the features which are interesting to $A$
 
-### After David Ideaa
+### After David 
+Connect an SAE to an attention head to discover which features are looking for which others. Do so by some chunky matmul. For example the the top-k features attended by feature $i$:
+$$
+f_j = topk_j ||(f_i W_D) W^{QK} [W_D]_j||_2
+$$
+For example we may observe that feature "cat" attends to "dog".
 
-
-## 
+**Roadbloacks**:
+- still assuming that SAE is already encoding all the features we're interested in
+- I don't feel like we're able to recover not even one of the heads of the IOI
+- What happens to ignored features? I expect that the majority of features is completely ignored by the QK matrix. maybe their norm get shrunk significantly? 
+## KV cache analysis/in-context knowledge
+Where is the in-context knowledge stored? 
