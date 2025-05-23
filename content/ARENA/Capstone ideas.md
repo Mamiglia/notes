@@ -24,5 +24,7 @@ recycle an SAE trained on $x$ to also check out what's happening with $q = M x =
 - LayerNorm actually screws things up
 - I don't like to rely on SAE to interpret as they might not capture the features which are interesting to $A$
 
+### After David Ideaa
+
 
 ## 
