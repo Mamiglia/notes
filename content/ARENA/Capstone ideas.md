@@ -43,6 +43,6 @@ Additionally we may also look into:
 
 **Details**
 - Get a model small enough to run this (with SAEs pretrained)
-- 
+- Get the $W^{QK}$ matrix for each of them 
 ## KV cache analysis/in-context knowledge
 Where is the in-context knowledge stored? 
