@@ -35,5 +35,14 @@ For example we may observe that feature "cat" attends to "dog".
 - still assuming that SAE is already encoding all the features we're interested in
 - I don't feel like we're able to recover not even one of the heads of the IOI
 - What happens to ignored features? I expect that the majority of features is completely ignored by the QK matrix. maybe their norm get shrunk significantly? 
+
+Additionally we may also look into:
+- Which features get ignored (by looking at the norm)
+- Which tokens attend to which features
+- Which features attend to which tokens
+
+**Details**
+- Get a model small enough to run this (with SAEs pretrained)
+- 
 ## KV cache analysis/in-context knowledge
 Where is the in-context knowledge stored? 
