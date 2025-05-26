@@ -48,4 +48,4 @@ Additionally we may also look into:
 - For now I'm using KQ rather than QK
 - Head 0.1 attends to same tokens. Behaviour transfers correctly to features. i.e. feature $i$ attends to itself 
 - As of now I notice that decoding simplified works better than full decoding
-- 
+- Layer norm seems to be not not important (0.99999 corr.) in the feats_attn 
