@@ -45,4 +45,7 @@ Additionally we may also look into:
 	- `gpt2-small-resid-post-v5-32k`
 	- `gpt2-small-resid-post-v5-128k`
 - What should be the distribution of feature_norm? Currently using 1
+- For now I'm using KQ rather than QK
+- Head 0.1 attends to same tokens. Behaviour transfers correctly to features. i.e. feature $i$ attends to itself 
+- As of now I notice that decoding simplified works better than full decoding
 - 
