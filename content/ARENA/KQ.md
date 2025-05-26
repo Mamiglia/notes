@@ -44,4 +44,5 @@ Additionally we may also look into:
 - Some SAEs do LayerNorm before processing! Can I use this to make everything linear?
 	- `gpt2-small-resid-post-v5-32k`
 	- `gpt2-small-resid-post-v5-128k`
-- What should be 
+- What should be the distribution of feature_norm? Currently using 1
+- 
