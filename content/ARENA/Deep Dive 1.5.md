@@ -49,4 +49,14 @@ E = \texttt{MLP}_0(W_E) \in \mathbb{R}^{|V| \times d}
 $$
 Where $|V|$ is the vocabulary size and $d=768$ is the size of the vectors in the residual stream.
 
-Using 
+Using $E$ we can then compute the whole token-to-token attention scores as:
+$$
+A_\text{tokens} = E\,\, W_Q W_K^T \,\,E^T
+$$
+And when we can check that for selected semantic groups it behaves as expected, high similarity in the block diagonal and lower on the diagonal (itself):
+
+![[token2token_attn.png]]
+
+```
+TABLE...
+```
