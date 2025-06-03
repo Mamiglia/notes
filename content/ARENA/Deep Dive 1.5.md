@@ -43,3 +43,10 @@ We find out that all previous components are irrelevant, except for:
 ![[component_importance.png]]
 Interestingly also the positional embedding seems irrelevant, as such we deduce that the attention head 1.5 is not using positional information to exclude itself or previous instances of itself from the attention pattern.
 
+Knowing this, we ablate in the rest of the analysis we ablate all unnecessary components, and compute the input of the attention head 1.5 as:
+$$
+E = \texttt{MLP}_0(W_E) \in \mathbb{R}^{|V| \times d}
+$$
+Where $|V|$ is the vocabulary size and $d=768$ is the size of the vectors in the residual stream.
+
+Using 
