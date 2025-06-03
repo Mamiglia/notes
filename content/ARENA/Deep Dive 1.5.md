@@ -58,7 +58,19 @@ And when we can check that for selected semantic groups it behaves as expected, 
 ![[token2token_attn.png]]
 
 ```
-TABLE...
+                                             Most Attended
+┏━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Input Token ┃ Top Attended Tokens                                                                               ┃
+┡━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ ' red'      │  Green,  Blue,  green,  blue, green,  Yellow,  GREEN, blue, Green,  White                         │
+│ ' 69'       │  72,  82,  70,  62,  71,  80,  68,  67,  66,  78                                                  │
+│ 'Monday'    │ Wednesday, Tuesday,  Wednesday,  Tuesday, Friday,  Tonight,  Friday,  tonight, Tonight,  tomorrow │
+│ ' John'     │  They,  Their, their,  THEIR, They,  their,  His, Their,  THEY,  they                             │
+│ ' +'        │  -,  -=,  ±, =-,  =,  –, =/,  --, =,  —                                                           │
+│ ' if'       │  when,  after,  When,  After,  if,  for, After,  where, When,  despite                            │
+│ ' Italy'    │  Iceland,  Turkish,  Pakistani,  Auckland,  Portugal,  Guatemala,  Zealand,  Pakistan,  Mexican,  │
+│             │ Chile                                                                                             │
+└─────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## 
