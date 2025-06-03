@@ -22,4 +22,24 @@ In order to find out which components matter to the attention head I:
 In order to elicit the specific semantic behaviour of the attention head we engineer the prompt as a bunch of tokens belonging to handpicked semantic categories shuffled together. Example:
 > `<bos> cat horse blue sun apple 32 red snow sun rain happy 32 blue sun green`
 
-Then we define a 
+Then given this prompt and the empirically observed behaviour we define a mask of the empirical attention pattern:
+![[expected_mask.png]]
+
+Then we define a metric to measure the distance to this expected behaviour as the KL-divergence from the expected distribution:
+$$
+KL(\{P_Q, 1 - P_Q\} || \{1,0\}) \,\,\, P_Q = M \odot A
+$$
+Where $A$ is the attention matrix, $M$ is the empirical attention pattern. Thus we're measuring how much probability mass is concentrated where we expect to find it. Concretely this develops as:
+$$
+\mathcal{L} = \frac{1}{|Q|} \sum_q -\log \left( \sum_k(M \odot A)_{qk} \right)
+$$
+We validate that this score is low only for the 5th head:
+![[heads_score.png]]
+
+Finally we proceed to mean-ablate all previous components to check which are able to retain the original score for the head 1.5. 
+We find out that all previous components are irrelevant, except for:
+- The embedding matrix $W_E$
+- The first MLP layer
+![[component_importance.png]]
+Interestingly also the positional embedding seems irrelevant, as such we deduce that the attention head 1.5 is not using positional information to exclude itself or previous instances of itself from the attention pattern.
+
