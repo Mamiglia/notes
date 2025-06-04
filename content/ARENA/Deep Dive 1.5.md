@@ -74,4 +74,8 @@ And when we can check that for selected semantic groups it behaves as expected, 
 ```
 
 ## Clustering
-	Using the computed token-to-token attention map we can use these scores to find clusters within the tokens
+Using the computed token-to-token attention map we can use these scores to find clusters within the tokens. I spent around ~1h finding the right hyperparameters for the [Leiden community detection algorithm](https://en.wikipedia.org/wiki/Leiden_algorithm), and I'm quite satisfied with the quality of the clusters found. Many are easily interpretable.
+If you're interested in getting to know how head 1.5 clusters the tokens (world model) and "perceives the world" you can check out the visualization at this link (INSERT LINK).
+
+
+
