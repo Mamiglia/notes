@@ -73,4 +73,5 @@ And when we can check that for selected semantic groups it behaves as expected, 
 └─────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## 
+## Clustering
+	Using the computed token-to-token attention map we can use these scores to find clusters within the tokens
