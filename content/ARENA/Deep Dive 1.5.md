@@ -80,9 +80,10 @@ If you're interested in getting to know how head 1.5 clusters the tokens (world 
 ## Mechanistic Understanding
 In this paragraph we try to understand how the head 1.5 implements the aforementioned attention mechanism: semantic similarity with self-suppression. In order to think about this problem first remember that the attention maps are computed as:
 $$
-A(X) = X\,\, W_{QK} \,\,X^T; \,\, \text{where } W_{QK} = W_Q W_K^T
+A(X) = X\,\, W_{QK} \,\,X^T; \,\, \text{where } W_{QK} = W_Q W_K^T \in \mathbb{R}^{L\times L}
 $$
 Thus it is essentially a bilinear transformation, that given a pair of tokens outputs a score. Which kind of bilinear transformation matches the described behaviour? 
 
 Formally, given an embedding vector $x, y, z$ such that $x \approx y$ are cosine similar and $x \negapprox z$ and $y \negapprox z$ we want:
 $$x W y^T > x W x^T > x W z^T$$
+Any square matrix can be decomposed in $W = W_{sym} + W_{skew}$ 
