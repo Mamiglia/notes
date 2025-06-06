@@ -29,7 +29,7 @@ Then we define a metric to measure the distance to this expected behaviour as th
 $$
 KL(\{P_Q, 1 - P_Q\} || \{1,0\}) \,\,\, P_Q = M \odot A
 $$
-Where $A$ is the attention matrix, $M$ is the empirical attention pattern. Thus we're measuring how much probability mass is concentrated where we expect to find it. Concretely this develops as:
+Where $A$ is the attention matrix, $M$ is the empirical attention pattern. Thus we're measuring how much probability mass is concentrated where we expect to find it. Props to David Quarel for this derivation. Concretely this develops as:
 $$
 \mathcal{L} = \frac{1}{|Q|} \sum_q -\log \left( \sum_k(M \odot A)_{qk} \right)
 $$
