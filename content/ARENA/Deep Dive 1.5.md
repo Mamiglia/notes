@@ -22,12 +22,12 @@ In order to find out which components matter to the attention head I:
 In order to elicit the specific semantic behaviour of the attention head we engineer the prompt as a bunch of tokens belonging to handpicked semantic categories shuffled together. Example:
 > `<bos> cat horse blue sun apple 32 red snow sun rain happy 32 blue sun green`
 
-Then given this prompt and the empirically observed behaviour we define a mask of the empirical attention pattern:
+Then given this prompt and the empirically observed behaviour we define a mask of the empirical attention pattern: (the attention pattern we expect to see)
 ![[expected_mask.png]]
 
 Then we define a metric to measure the distance to this expected behaviour as the KL-divergence from the expected distribution:
 $$
-KL(\{P_Q, 1 - P_Q\} || \{1,0\}) \,\,\, P_Q = M \odot A
+KL(\{P_Q, 1 - P_Q\} || \{1,0\}) \,\, \,\,\,\, P_Q = M \odot A
 $$
 Where $A$ is the attention matrix, $M$ is the empirical attention pattern. Thus we're measuring how much probability mass is concentrated where we expect to find it. Props to David Quarel for this derivation. Concretely this develops as:
 $$
@@ -75,7 +75,7 @@ And when we can check that for selected semantic groups it behaves as expected, 
 
 ## Clustering
 Using the computed token-to-token attention map we can use these scores to find clusters within the tokens. I spent around ~1h finding the right hyperparameters for the [Leiden community detection algorithm](https://en.wikipedia.org/wiki/Leiden_algorithm), and I'm quite satisfied with the quality of the clusters found. Many are easily interpretable.
-If you're interested in getting to know how head 1.5 clusters the tokens (world model) and "perceives the world" you can check out the visualization at this link (INSERT LINK).
+If you're interested in getting to know how head 1.5 clusters the tokens (world model) and "perceives the world" you can check out the visualization at this link https://mamiglia.github.io/feature-attn/.
 
 ## Mechanistic Understanding
 In this paragraph we try to understand how the head 1.5 implements the aforementioned attention mechanism: semantic similarity with self-suppression. In order to think about this problem first remember that the attention maps are computed as:
@@ -84,3 +84,5 @@ A(X) = X\,\, W_{QK} \,\,X^T; \,\, \text{where } W_{QK} = W_Q W_K^T
 $$
 Thus it is essentially a bilinear transformation, that given a pair of tokens outputs a score. Which kind of bilinear transformation matches the described behaviour? 
 
+Formally, given an embedding vector $x, y, z$ such that $x \approx y$ are cosine similar and $x \negapprox z$ and $y \negapprox z$ we want:
+$$x W y^T > x W x^T > x W z^T$$
