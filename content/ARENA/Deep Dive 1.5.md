@@ -78,5 +78,9 @@ Using the computed token-to-token attention map we can use these scores to find 
 If you're interested in getting to know how head 1.5 clusters the tokens (world model) and "perceives the world" you can check out the visualization at this link (INSERT LINK).
 
 ## Mechanistic Understanding
-In this paragraph we try to understand how the head 1.5 implements the aforementioned attention mechanism: low self-attention, 
+In this paragraph we try to understand how the head 1.5 implements the aforementioned attention mechanism: semantic similarity with self-suppression. In order to think about this problem first remember that the attention maps are computed as:
+$$
+A(X) = X\,\, W_{QK} \,\,X^T; \,\, \text{where } W_{QK} = W_Q W_K^T
+$$
+Thus it is essentially a bilinear transformation, that given a pair of tokens outputs a score. Which kind of bilinear transformation matches the described behaviour? 
 
