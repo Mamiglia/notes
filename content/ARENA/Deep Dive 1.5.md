@@ -87,3 +87,8 @@ Thus it is essentially a bilinear transformation, that given a pair of tokens ou
 Formally, given an embedding vector $x, y, z$ such that $x \approx y$ are cosine similar and $x \negapprox z$ and $y \negapprox z$ we want:
 $$x W y^T > x W x^T > x W z^T$$
 Any square matrix can be decomposed in $W = W_{sym} + W_{skew}$ 
+
+
+
+#### notes
+- plotta score over epsilon (x-y, xy, cos theta)
