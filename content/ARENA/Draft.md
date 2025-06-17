@@ -10,6 +10,8 @@ url:
 >
 >_work performed as part of ARENA 5.0 Capstone project_
 
+
+
 ## Introduction
 Within gpt2-small lies an unusual component: attention head L1H5[^1] which fires on semantically similar concepts. It excels at connecting related concepts: the token `cat` attends to `dog`, and `red` attends to `green` and `blue`. Normally, this would be unsurprising, as we would expect embedding vectors to already cluster based on topic/semantic categories. But oddly enough, for this head, tokens do not attend to themselves. For example, the token `dog` will attend to other animals in the context, but it will not attend to itself or other instances of the token `dog`.
 
@@ -75,9 +77,11 @@ Surprisingly, 2 out of 4 components are completely irrelevant. The head's behavi
 - The token embedding matrix, $W_E$​.
 - The first MLP layer, $\texttt{MLP}_0$​.
 - The residual stream around the first MLP.
-![[Pasted image 20250617142846.png]]
+![[component_importance.png]]
 
 Interestingly, ablating the positional embeddings ($W_{pos}$​) and the previous attention layer ($\texttt{Attn}_0$) had almost no effect. This is a crucial clue: the head isn't using positional or sequential information to avoid attending to itself. The mechanism must be inherent to the token representations themselves, which in turn depend only on the embedding matrix ($W_E$) and the MLP.
+
+![[component_ablation.png]]
 
 From this, I concluded that the essential input to L1H5 can be represented simply as:
 $$
@@ -116,6 +120,7 @@ url: "https://mamiglia.github.io/feature-attn"
 
 
 If you do you may note some interesting clusters:
+![[clusters.png]]
 
 Note also that tokens don't usually attend to themselves (or different versions of themselves). For example `east` doesn't attend to `East`, `Eastern`, `eastern`.
 
