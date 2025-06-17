@@ -62,7 +62,7 @@ A_\text{tokens} = E\,\, W_Q W_K^T \,\,E^T
 $$
 And when i can check that for selected semantic groups it behaves as expected, high similarity in the block diagonal and lower on the diagonal (itself):
 
-![[ARENA/token2token_attn.png]]
+![[token2token_attn.png]]
 
 ```
                                              Most Attended
