@@ -33,11 +33,11 @@ First, we need to isolate this behavior and find the components responsible for 
 To reliably trigger the head's behavior, I created a simple prompt by shuffling tokens from various hand-picked semantic categories. This creates a context where the head has many opportunities to demonstrate its preference for in-category attention.
 
 ```
-<bos> 32 green green cat red 4 green scared angry 50 blue purple red cat cat
+<bos> blue sad cat purple purple 24 blue cat purple sheep 69 32 happy horse angry
 ```
 
 Based on the three rules observed above, I defined an "expected" attention pattern for this prompt. For example, `cat` should attend to `horse`, but not to `cat` or `blue`. This gives me a target mask representing the idealized behavior of the head.
-
+![[expected _mask.png]]
 _Example of expected attention pattern._
 
 ### Semantic Category Score
@@ -48,6 +48,7 @@ $$
 $$
 
 A lower score means a better match. As expected, a survey of all heads in the model shows that L1H5 is an outlier with a uniquely low score, confirming it's specialized for this task.
+![[surprisal.png]]
 
 +++ Loss derivation
 
@@ -125,6 +126,7 @@ $$x\,W_{QK}​\,y^T>x\,W_{QK}\,​x^T>x\,W_{QK}​\,z^T$$
 
 To empirically verify this we can plot the average attention score obtained by a pair $x,y$ in L1H5 against their initial similarity. We can notice that the peak attention score is not at a similarity of 1, but below it, at circa 0.7, showing the head prefers tokens that are similar, but not identical.
 
+![[attn_over_similarity.png]]
 _Attention score between similar tokens. Note that most of the tokens have low similarity, so most of the mass concentrated between 0.1 and 0.7. Above that we have less data and thus much more variability._
 
 ### Decomposing the Matrix
@@ -140,6 +142,8 @@ W_{QK} &= W_{sym} + W_{skew}
 This decomposition is useful because the skew-symmetric part always has zero contribution to self-attention ($x W_{skew​} x^T=0$).
 
 When I tested these components separately, the result was clear. The symmetric matrix, $W_{sym}$​, was able to reproduce the full behavior on its own: high off-diagonal attention within semantic blocks and low diagonal self-attention. The skew-symmetric part had a negligible effect.
+
+![[base_sym_skew_attn.png]]
 
 +++ About $W_{skew}$​
 
@@ -163,7 +167,6 @@ The head suppresses self-attention for a vector $x$ by having it align with "sup
 This is a testable hypothesis. First, I computed the 64 eigenvalues of $W_{sym}$​ and found that 33 of them are negative. This strongly supports the theory.
 
 The ultimate test is to see if we can control the behavior by manipulating these eigenvalues. I created a steering mechanism to scale all negative eigenvalues by a factor $\alpha \in \mathbb{R}$.
-	 
 ```
 # Decompose the symmetric matrix
 eigenvalues, eigenvectors = eigen_decomposition(W_sym)
