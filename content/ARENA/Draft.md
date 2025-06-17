@@ -9,10 +9,7 @@ url:
 >*TL;DR*: gpt2-small's head L1H5 directs attention to semantically similar tokens and actively suppresses self-attention. The head computes attention purely based on token identity, independent of position. This mechanism is driven by a symmetric bilinear form with negative eigenvalues, which enables suppression. We cluster tokens semantically, interpret the weights to explain the attention scores, and steer self-suppression by tuning eigenvalues.
 >
 >_work performed as part of ARENA 5.0 Capstone project_
-
-
-
-## Introduction
+## Introductionz
 Within gpt2-small lies an unusual component: attention head L1H5[^1] which fires on semantically similar concepts. It excels at connecting related concepts: the token `cat` attends to `dog`, and `red` attends to `green` and `blue`. Normally, this would be unsurprising, as we would expect embedding vectors to already cluster based on topic/semantic categories. But oddly enough, for this head, tokens do not attend to themselves. For example, the token `dog` will attend to other animals in the context, but it will not attend to itself or other instances of the token `dog`.
 
 This behavior is too specific to be an accident. This research project aims to find the mechanistic explanation for this semantic grouping and self-avoidance, with the goal to develop useful techniques for analyzing attention patterns along the way.
@@ -40,7 +37,7 @@ To reliably trigger the head's behavior, I created a simple prompt by shuffling 
 [View Attention Pattern](attention_pattern.html)
 
 Based on the three rules observed above, I defined an "expected" attention pattern for this prompt. For example, `cat` should attend to `horse`, but not to `cat` or `blue`. This gives me a target mask representing the idealized behavior of the head.
-![[expected _mask.png]]
+![[expected_mask.png]]
 _Example of expected attention pattern._
 
 ### Semantic Category Score
@@ -95,7 +92,7 @@ Using this simplified input E, we can circumvent the rest of the network and com
 $$A_{tokens}​=E\,\, W_Q ​W_K^T \,\,​ E^T$$
 
 Here, $W_{QK}​ = W_Q ​W_K^T$​ is the attention head's QK circuit. Visualizing this for selected semantic groups reveals the behavior perfectly: high scores within a semantic block (e.g., colors attending to other colors) but low scores on the diagonal (a token attending to itself).
-
+![[token2token_attn.png]]
 _Tokens attend to other semantically related tokens, but not themselves (low diagonal values)._
 
 The head's semantic groupings are robust and intuitive:
@@ -189,6 +186,7 @@ attn_map = E * W_steered * E.T
 ```
 
 As it can be seen by the plot below, when scaling alpha one can successfully steer the attention map and force it to start paying attention to the current token, while also maintaining the similarity of semantically related tokens:
+![[steered_eigenvalue_attention.png]]
 
 ## Conclusion
 This study offers a mechanistic account of gpt2-small attention head L1H5’s unusual behavior. Its tendency to attend to semantically related tokens, while suppressing self-attention, appears to arise from a symmetric bilinear form with carefully placed negative eigenvalues. This effect seems to operate independently of position, relying only on transformed token embeddings. Decomposing the attention matrix and inspecting its spectrum suggests that negative eigenvalues play a key role in self-suppression. Moreover, this behavior can be steered by adjusting the spectrum, pointing to a possible causal link between spectral structure and function. These results add to our grasp of attention in LLMs and hopefully hint at new ways to interpret and steer their internal workings.
