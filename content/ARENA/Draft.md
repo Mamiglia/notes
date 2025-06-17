@@ -9,7 +9,7 @@ url:
 >*TL;DR*: gpt2-small's head L1H5 directs attention to semantically similar tokens and actively suppresses self-attention. The head computes attention purely based on token identity, independent of position. This mechanism is driven by a symmetric bilinear form with negative eigenvalues, which enables suppression. We cluster tokens semantically, interpret the weights to explain the attention scores, and steer self-suppression by tuning eigenvalues.
 >
 >_work performed as part of ARENA 5.0 Capstone project_
-## Introductionz
+## Introduction
 Within gpt2-small lies an unusual component: attention head L1H5[^1] which fires on semantically similar concepts. It excels at connecting related concepts: the token `cat` attends to `dog`, and `red` attends to `green` and `blue`. Normally, this would be unsurprising, as we would expect embedding vectors to already cluster based on topic/semantic categories. But oddly enough, for this head, tokens do not attend to themselves. For example, the token `dog` will attend to other animals in the context, but it will not attend to itself or other instances of the token `dog`.
 
 This behavior is too specific to be an accident. This research project aims to find the mechanistic explanation for this semantic grouping and self-avoidance, with the goal to develop useful techniques for analyzing attention patterns along the way.
@@ -51,7 +51,7 @@ A lower score means a better match. As expected, a survey of all heads in the mo
 
 +++ Loss derivation
 
-We define this metric as the distance from the expected behaviour described above. We encode the expected behaviour through the mask matrix M, and define Pq​=M⊙A as the amount of probability mass that the attention scores places on other tokens in the same semantic category. We can then measure the distance of Pq​,1−Pq​ as the KL divergence from the ideal distribution 1,0 where all the probability mass is concentrated where we expect it to be. Then this derivation follows
+We define this metric as the distance from the expected behaviour described above. We encode the expected behaviour through the mask matrix $M$, and define $P_q = M \odot A$ as the amount of probability mass that the attention scores places on other tokens in the same semantic category. We can then measure the distance of $\{P_q, 1 - P_q\}$ as the KL divergence from the ideal distribution $\{1,0\}$ where all the probability mass is concentrated where we expect it to be. Then this derivation follows
 
 $$
 \begin{align}
@@ -68,7 +68,7 @@ A KL divergence between $\{1,0\}$ and $\{P_q​,1−P_q​\}$ devolves in $−\l
 +++
 
 ### The Ablation
-With a reliable metric, I could perform a mean-ablation study. I systematically replaced the output of each preceding component with its mean value and checked if the score for L1H5 increases; if it does it means that the component is relevant for L1H5.
+With a reliable metric, I could perform a mean-ablation study[^4]. I systematically replaced the output of each preceding component with its mean value and checked if the score for L1H5 increases; if it does it means that the component is relevant for L1H5.
 
 Surprisingly, 2 out of 4 components are completely irrelevant. The head's behaviour appears to be affected only by:
 - The token embedding matrix, $W_E$​.
@@ -106,7 +106,7 @@ The head's semantic groupings are robust and intuitive:
 | `Italy`         | Iceland, Turkish, Pakistani, Auckland, Portugal, Guatemala, Zealand, Pakistan, Mexican, Chile |
 
 ### Clustering
-Using this attention map, I ran the Leiden community detection algorithm to cluster the main 3000 tokens of English language. The resulting clusters are surprisingly coherent and offer a fascinating glimpse into the "world model" of this specific head. You can explore this interactive map for yourself [here](https://mamiglia.github.io/feature-attn) .[^2]
+Using this attention map, I ran the Leiden community detection algorithm[^2] to cluster the main 3000 tokens of English language. The resulting clusters are surprisingly coherent and offer a fascinating glimpse into the "world model" of this specific head. You can explore this interactive map for yourself [here](https://mamiglia.github.io/feature-attn) .[^3]
 
 ```embed
 title: "GPT2 Head 1.5 Visualizer"
@@ -152,7 +152,7 @@ We note that the norm of attention scores produced by $W_{skew}​$ is significa
 
 Additionally I set up a quick ablation study in which I observe the drop in logit value of the correct token after ablating some component, in a number of selected samples from the WikiText dataset that contain references to semantic groups. While ablating $W_{sym}​$ results in a drop of 0.049, ablating $W_{skew}​$ actually **improves** performance (a drop of -0.3520), hinting it might introduce some counter-productive noise for this specific function.
 
-While these observations might hint at $W_{skew}​$ being involved in encoding ordering or sequence information, its precise role in the self-suppression mechanism appears minor, prompting us to primarily focus on $W_{sym}$​ for further investigation.
+While $W_{skew}​$ might be involved in encoding ordering or sequence information, these observations suggest that its precise role in the self-suppression mechanism is minor, prompting us to primarily focus on $W_{sym}$​ for further investigation.
 
 +++
 ### The Role of Eigenvalues
@@ -163,7 +163,7 @@ If all eigenvalues $\lambda_i$​ were positive, this score would always be posi
 
 This leads to our central hypothesis: **self-suppression occurs because** $W_{sym}​$ **has negative eigenvalues.** If a vector $x$ has a significant projection onto an eigenvector $p_j$​ whose eigenvalue $\lambda_j$​ is negative, that component $\lambda_j ​(p_j^T ​x)^2$ will be negative, reducing the total score.
 
-The head suppresses self-attention for a vector $x$ by having it align with "suppressive directions" in the space defined by $W_{sym}​$.
+The head suppresses self-attention for a vector $x$ by having it align with "suppressive directions" $p_j$ in the space defined by $W_{sym}​$. 
 
 ## Part 4: Validation by Steering
 This is a testable hypothesis. First, I computed the 64 eigenvalues of $W_{sym}$​ and found that 33 of them are negative. This strongly supports the theory.
@@ -193,4 +193,9 @@ This study offers a mechanistic account of gpt2-small attention head L1H5’s un
 
 [^1]: Layer 1, Head 5
 
-[^2]: https://mamiglia.github.io/feature-attn
+[^2]: https://en.wikipedia.org/wiki/Leiden_algorithm
+
+[^3]: https://mamiglia.github.io/feature-attn
+
+
+[^4]: An activation patching technique where the activations are replaced with their mean across tokens. [Glossary](https://www.neelnanda.io/mechanistic-interpretability/glossary#:~:text=Ablation%20aka%20Knockout), [How to use and interpret activation patching](https://arxiv.org/abs/2404.15255v1)
