@@ -35,6 +35,7 @@ To reliably trigger the head's behavior, I created a simple prompt by shuffling 
 ```
 <bos> blue sad cat purple purple 24 blue cat purple sheep 69 32 happy horse angry
 ```
+[View Attention Pattern](attention_pattern.html)
 
 Based on the three rules observed above, I defined an "expected" attention pattern for this prompt. For example, `cat` should attend to `horse`, but not to `cat` or `blue`. This gives me a target mask representing the idealized behavior of the head.
 ![[expected _mask.png]]
@@ -46,7 +47,6 @@ To measure how well the head's actual attention pattern, $A$, matches the expect
 $$
 \mathcal{L} = \frac{1}{|Q|}\sum_q - \log{\sum_k (M \odot A)_{qk}} 
 $$
-
 A lower score means a better match. As expected, a survey of all heads in the model shows that L1H5 is an outlier with a uniquely low score, confirming it's specialized for this task.
 ![[surprisal.png]]
 
