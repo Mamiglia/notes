@@ -75,11 +75,11 @@ Surprisingly, 2 out of 4 components are completely irrelevant. The head's behavi
 - The token embedding matrix, $W_E$​.
 - The first MLP layer, $\texttt{MLP}_0$​.
 - The residual stream around the first MLP.
+![[Pasted image 20250617142846.png]]
 
 Interestingly, ablating the positional embeddings ($W_{pos}$​) and the previous attention layer ($\texttt{Attn}_0$) had almost no effect. This is a crucial clue: the head isn't using positional or sequential information to avoid attending to itself. The mechanism must be inherent to the token representations themselves, which in turn depend only on the embedding matrix ($W_E$) and the MLP.
 
-From this, I concluded that the essential input to L1H5 is simply:
-
+From this, I concluded that the essential input to L1H5 can be represented simply as:
 $$
 E = \texttt{MLP}_0(W_E) + W_E \quad \in \mathbb{R}^{|V|\times d}
 $$
