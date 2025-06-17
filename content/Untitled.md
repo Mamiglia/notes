@@ -163,7 +163,7 @@ The head suppresses self-attention for a vector $x$ by having it align with "sup
 This is a testable hypothesis. First, I computed the 64 eigenvalues of $W_{sym}$​ and found that 33 of them are negative. This strongly supports the theory.
 
 The ultimate test is to see if we can control the behavior by manipulating these eigenvalues. I created a steering mechanism to scale all negative eigenvalues by a factor $\alpha \in \mathbb{R}$.
-
+	 
 ```
 # Decompose the symmetric matrix
 eigenvalues, eigenvectors = eigen_decomposition(W_sym)
