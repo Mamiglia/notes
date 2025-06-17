@@ -115,7 +115,6 @@ description: "Filter by Cluster:"
 url: "https://mamiglia.github.io/feature-attn"
 ```
 
-
 If you do you may note some interesting clusters:
 ![[clusters.png]]
 
@@ -126,10 +125,10 @@ How does a single matrix, $W_{QK}$​, implement this complex behavior? Formally
 
 $$x\,W_{QK}​\,y^T>x\,W_{QK}\,​x^T>x\,W_{QK}​\,z^T$$
 
-To empirically verify this we can plot the average attention score obtained by a pair $x,y$ in L1H5 against their initial similarity. We can notice that the peak attention score is not at a similarity of 1, but below it, at circa 0.7, showing the head prefers tokens that are similar, but not identical.
+To empirically verify this we can plot the average attention score obtained by a pair $x,y$ in L1H5 against their initial similarity. We can notice that the peak attention score is not at a similarity of 1, but below it, at circa 0.95, showing the head prefers tokens that are similar, but not identical.
 
 ![[attn_over_similarity.png]]
-_Attention score between similar tokens. Note that most of the tokens have low similarity, so most of the mass concentrated between 0.1 and 0.7. Above that we have less data and thus much more variability._
+_Attention score between similar tokens. Note that most of the tokens have low similarity, so most of the mass concentrated between 0.6 and 0.9. Above that we have less data and thus much more variability._
 
 ### Decomposing the Matrix
 To understand how $W_{QK}$​ works, I decomposed it into its symmetric and skew-symmetric parts:
@@ -157,11 +156,12 @@ While these observations might hint at $W_{skew}​$ being involved in encoding 
 
 +++
 ### The Role of Eigenvalues
-So, the mystery is contained entirely within $W_{sym}$​, how does it suppress self-attention? We can decompose it using its eigenvalues ($\lambda_i$) and eigenvectors ($p_i$​): $W_{sym}​ = P\Lambda P^T$. The attention score is then:
-$$x\,W_{sym}\,​x^T = \sum_i ​\lambda_i​(q_i^T​x)^2 $$
+So, the mystery is contained entirely within $W_{sym}$​, how does it suppress self-attention? 
+Any symmetric matrix can be decomposed using its eigenvalues ($\lambda_i \in \mathbb{R}$) and eigenvectors ($p_i \in \mathbb{R}^d$), such that $W_{sym}​ = P\Lambda P^T$. The attention score is then:
+$$x\,W_{sym}\,​x^T = \sum_i ​\lambda_i​(p_i^T​x)^2 $$
 If all eigenvalues $\lambda_i$​ were positive, this score would always be positive. A vector would achieve its highest score by aligning with the eigenvectors corresponding to the largest positive eigenvalues.
 
-This leads to our central hypothesis: **Self-suppression occurs because** $W_{sym}​$ **has negative eigenvalues.** If a vector $x$ has a significant projection onto an eigenvector $p_j$​ whose eigenvalue $\lambda_j$​ is negative, that component $\lambda_j ​(q_j^T ​x)^2$ will be negative, reducing the total score.
+This leads to our central hypothesis: **self-suppression occurs because** $W_{sym}​$ **has negative eigenvalues.** If a vector $x$ has a significant projection onto an eigenvector $p_j$​ whose eigenvalue $\lambda_j$​ is negative, that component $\lambda_j ​(p_j^T ​x)^2$ will be negative, reducing the total score.
 
 The head suppresses self-attention for a vector $x$ by having it align with "suppressive directions" in the space defined by $W_{sym}​$.
 
