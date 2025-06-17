@@ -41,7 +41,7 @@ Based on the three rules observed above, I defined an "expected" attention patte
 _Example of expected attention pattern._
 
 ### Semantic Category Score
-To measure how well the head's actual attention pattern, A, matches my expected pattern, M, we use a KL divergence-based score: KL(PQ​,1−PQ​∣∣1,0) where PQ​=M⊙A. The goal here is to measure how much of the attention probability mass is concentrated where the mask says it should be. This leads to the following loss function (credit to @David Quarel for the derivation):
+To measure how well the head's actual attention pattern, $A$, matches the expected pattern, $M$, we use a KL divergence-based score: $KL(\{1,0\} || \{P_q, 1 - P_q\})$ where $P_Q​=M\odot A$. The goal here is to measure how much of the attention probability mass is concentrated where the mask says it should be. This leads to the following loss function (credit to @David Quarel for the derivation):
 
 $$
 \mathcal{L} = \frac{1}{|Q|}\sum_q - \log{\sum_k (M \odot A)_{qk}} 
