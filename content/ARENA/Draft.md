@@ -34,7 +34,7 @@ To reliably trigger the head's behavior, we define a simple prompt by shuffling 
 ```
 <bos> blue sad cat purple purple 24 blue cat purple sheep 69 32 happy horse angry
 ```
-[View Attention Pattern](https://mamiglia.github.io/feature-attn/attention_pattern.html)
+ [![Viz](https://img.shields.io/badge/Viz-Attention%20map-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/attention_pattern.html)
 
 Based on the three rules observed above, we define an "expected" attention pattern for this prompt. For example, `purple` should attend to `blue`, but not to `cat` or `purple`. This gives us a target mask representing the idealized behavior of the head.
 ![[expected_mask.png]]
@@ -107,13 +107,8 @@ Again note that `red` doesn't attend to `red`, nor to same meaning tokens like `
 ### Clustering
 Using this attention map, we ran the Leiden community detection algorithm[^2] to cluster the main 3000 tokens of English language. The resulting clusters are surprisingly coherent and offer a fascinating glimpse into the "world model" of this specific head. You can explore this interactive map for yourself [here](https://mamiglia.github.io/feature-attn) .[^3]
 
-```embed
-title: "GPT2 Head 1.5 Visualizer"
-image: "https://mamiglia.github.io/favicon.ico"
-description: "Filter by Cluster:"
-url: "https://mamiglia.github.io/feature-attn"
-```
-
+[![Viz](https://img.shields.io/badge/Viz-Clusters-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/)
+ 
 If you do you may note some interesting clusters:
 ![[clusters.png]]
 
