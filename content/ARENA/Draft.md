@@ -29,14 +29,14 @@ These rules hold remarkably consistently across different types of semantic cate
 First, we need to isolate this behavior and find the components responsible for it. This required a three-step process: design a prompt to reliably trigger the behavior, define a metric to measure it, and ablate components to see which ones break it.
 
 ### The Setup
-To reliably trigger the head's behavior, I created a simple prompt by shuffling tokens from various hand-picked semantic categories. This creates a context where the head has many opportunities to demonstrate its preference for in-category attention.
+To reliably trigger the head's behavior, we define a simple prompt by shuffling tokens from various hand-picked semantic categories. This creates a context where the head has many opportunities to demonstrate its preference for in-category attention.
 
 ```
 <bos> blue sad cat purple purple 24 blue cat purple sheep 69 32 happy horse angry
 ```
 [View Attention Pattern](https://mamiglia.github.io/feature-attn/attention_pattern.html)
 
-Based on the three rules observed above, I defined an "expected" attention pattern for this prompt. For example, `purple` should attend to `blue`, but not to `cat` or `purple`. This gives us a target mask representing the idealized behavior of the head.
+Based on the three rules observed above, we define an "expected" attention pattern for this prompt. For example, `purple` should attend to `blue`, but not to `cat` or `purple`. This gives us a target mask representing the idealized behavior of the head.
 ![[expected_mask.png]]
 _Example of expected attention pattern._
 
@@ -79,7 +79,7 @@ Surprisingly, 2 out of 4 components are completely irrelevant. The head's behavi
 Interestingly, ablating the positional embeddings ($W_{pos}$​) and the previous attention layer ($\texttt{Attn}_0$) had almost no effect. This is a crucial clue: **L1H5 isn't using positional or sequential information to avoid attending to itself**. The self-suppression mechanism must be inherent to the token representations themselves, which in turn depend only on the embedding matrix ($W_E$) and the MLP.
 ![[component_ablation 1.png]]
 
-From this, I concluded that the essential input to L1H5 can be represented simply as:
+From this, we conclude that the essential input to L1H5 can be represented simply as:
 $$
 E = \texttt{MLP}_0(W_E) + W_E \quad \in \mathbb{R}^{|V|\times d}
 $$
@@ -88,7 +88,7 @@ This matrix E contains a "processed" embedding for every token in the vocabulary
 ## Part 2: The World According to L1H5
 Using this simplified input E, we can circumvent the rest of the network and compute a full token-to-token attention score matrix directly:
 
-$$A_{tokens}​=E\,\, W_Q ​W_K^T \,\,​ E^T$$
+$$A_{tokens}​=Q K^T = (E W_Q) (​E W_K)^T = E\,\, W_Q ​W_K^T \,\,​ E^T$$
 
 Here, $W_{QK}​ = W_Q ​W_K^T$​ is the attention head's QK circuit. Visualizing this for selected semantic groups reveals the behavior perfectly: high scores within a semantic block (e.g., colours attending to other colours) but low scores on the diagonal (a token attending to itself).
 ![[token2token_attn.png]]
@@ -105,7 +105,7 @@ The head's semantic groupings are robust and intuitive, here we show the top 10 
 | `Italy`         | Iceland, Turkish, Pakistani, Auckland, Portugal, Guatemala, Zealand, Pakistan, Mexican, Chile     |
 Again note that `red` doesn't attend to `red`, nor to same meaning tokens like `_red`, `RED`, `_Red`, etc... 
 ### Clustering
-Using this attention map, I ran the Leiden community detection algorithm[^2] to cluster the main 3000 tokens of English language. The resulting clusters are surprisingly coherent and offer a fascinating glimpse into the "world model" of this specific head. You can explore this interactive map for yourself [here](https://mamiglia.github.io/feature-attn) .[^3]
+Using this attention map, we ran the Leiden community detection algorithm[^2] to cluster the main 3000 tokens of English language. The resulting clusters are surprisingly coherent and offer a fascinating glimpse into the "world model" of this specific head. You can explore this interactive map for yourself [here](https://mamiglia.github.io/feature-attn) .[^3]
 
 ```embed
 title: "GPT2 Head 1.5 Visualizer"
@@ -130,7 +130,7 @@ To empirically verify this we can plot the average attention score obtained by a
 _Attention score between similar tokens. Note that most of the tokens have low similarity, so most of the mass concentrated between 0.6 and 0.9. Outside of that there is less data, thus more variability._
 
 ### Decomposing the Matrix
-To understand how $W_{QK}$​ works, I decomposed it into its symmetric and skew-symmetric parts:
+To understand how $W_{QK}$​ works, we decompose it into its symmetric and skew-symmetric parts:
 
 $$
 \begin{align} 
@@ -141,7 +141,7 @@ W_{QK} &= W_{sym} + W_{skew}
 \end{align}​$$
 This decomposition is useful because the skew-symmetric part always has zero contribution to self-attention ($x W_{skew​} x^T=0$).
 
-When I tested these components separately, the result was clear. The symmetric matrix, $W_{sym}$​, was able to reproduce the full behavior on its own: high off-diagonal attention within semantic blocks and low diagonal self-attention. The skew-symmetric part had a negligible effect.
+When we test these components separately, the result is clear. The symmetric matrix, $W_{sym}$​, is able to reproduce the full behavior on its own: high off-diagonal attention within semantic blocks and low diagonal self-attention. The skew-symmetric part has a negligible effect.
 
 ![[base_sym_skew_attn.png]]
 
@@ -162,12 +162,10 @@ This leads to our central hypothesis: **self-suppression occurs when** $W_{sym}�
 
 > The head suppresses self-attention for a vector $x$ by having it align with "suppressive directions" $p_j$ in the space defined by $W_{sym}​$. 
 
-When 
-
 ## Part 4: Validation by Steering
-Now that we know this,  First, I computed the 64 eigenvalues of $W_{sym}$​ and found that 33 of them are negative. This strongly supports the theory.
+Now that we know this we can try to elicit or remove this behaviour. First, we compute the 64 eigenvalues of $W_{sym}$​ and found that 33 of them are negative.
 
-The ultimate test is to see if we can control the behavior by manipulating these eigenvalues. I created a steering mechanism to scale all negative eigenvalues by a factor $\alpha \in \mathbb{R}$.
+Now we can control the behaviour by manipulating these eigenvalues. We define a steering mechanism to scale all negative eigenvalues by a factor $\alpha \in \mathbb{R}$.
 ```
 # Decompose the symmetric matrix
 eigenvalues, eigenvectors = eigen_decomposition(W_sym)
@@ -184,11 +182,15 @@ W_steered = eigenvectors * diag(eigenvalues) * eigenvectors.T
 attn_map = E * W_steered * E.T
 ```
 
-As it can be seen by the plot below, when scaling alpha one can successfully steer the attention map and force it to start paying attention to the current token, while also maintaining the similarity of semantically related tokens:
-![[steered_eigenvalue_attention.png]]
+We scale negative eigenvalues by a parameter αα, reconstruct $W_{sym}$​, and recompute attention.
+- $\alpha < 1$ reduces self-suppression (self-attends more)
+- $\alpha > 1$ strengthens self-suppression.
+
+This gives direct causal control over whether tokens attend to themselves while preserving semantic clustering. As it can be seen by the plot below, when scaling $\alpha$ we can successfully steer the attention map, while also maintaining the similarity of semantically related tokens.
+![[steered_attn.png]]
 
 ## Conclusion
-This study offers a mechanistic account of gpt2-small attention head L1H5’s unusual behavior. Its tendency to attend to semantically related tokens, while suppressing self-attention, appears to arise from a symmetric bilinear form with carefully placed negative eigenvalues. This effect seems to operate independently of position, relying only on transformed token embeddings. Decomposing the attention matrix and inspecting its spectrum suggests that negative eigenvalues play a key role in self-suppression. Moreover, this behavior can be steered by adjusting the spectrum, pointing to a possible causal link between spectral structure and function. These results add to our grasp of attention in LLMs and hopefully hint at new ways to interpret and steer their internal workings.
+This study offers a mechanistic account of gpt2-small attention head L1H5’s unusual behaviour. Its tendency to attend to semantically related tokens, while suppressing self-attention, appears to arise from a symmetric bilinear form with carefully placed negative eigenvalues. This effect seems to operate independently of position, relying only on transformed token embeddings. Decomposing the attention matrix and inspecting its spectrum suggests that negative eigenvalues play a key role in self-suppression. Moreover, this behavior can be steered by adjusting the spectrum, pointing to a possible causal link between spectral structure and function. These results add to our grasp of attention in LLMs and hopefully hint at new ways to interpret and steer their internal workings.
 
 [^1]: Layer 1, Head 5
 
