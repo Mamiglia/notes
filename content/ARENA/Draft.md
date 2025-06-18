@@ -6,219 +6,194 @@ tags:
   - unprocessed
 url:
 ---
-> ***TL;DR***: gpt2-small's head L1H5 directs attention to semantically similar tokens and actively suppresses self-attention. The head computes attention purely based on token identity, independent of position. This mechanism is driven by a symmetric bilinear form with negative eigenvalues, which enables suppression. We cluster tokens semantically, interpret the weights to explain the attention scores, and steer self-suppression by tuning eigenvalues.
-> 
-> *work performed as part of ARENA 5.0 Capstone project.*
-
-Within gpt2-small lies an unusual component: attention head L1H5[^\[1\]^](#fn-G4ZrTFQxNxyGPPeNo-1) which fires on semantically similar concepts. It excels at connecting related concepts: the token `cat` attends to `dog`, and `red` attends to `green` and `blue`. Normally, this would be unsurprising, as we would expect embedding vectors to already cluster based on topic/semantic categories. But oddly enough, for this head, **tokens do not attend to themselves**. For example, the token `dog` will attend to other animals in the context, but it will not attend to itself or other instances of the token `dog`.
+>*TL;DR*: gpt2-small's head L1H5 directs attention to semantically similar tokens and actively suppresses self-attention. The head computes attention purely based on token identity, independent of position. This mechanism is driven by a symmetric bilinear form with negative eigenvalues, which enables suppression. We cluster tokens semantically, interpret the weights to explain the attention scores, and steer self-suppression by tuning eigenvalues.
+>
+>_work performed as part of ARENA 5.0 Capstone project_
+## Introduction
+Within gpt2-small lies an unusual component: attention head L1H5[^1] which fires on semantically similar concepts. It excels at connecting related concepts: the token `cat` attends to `dog`, and `red` attends to `green` and `blue`. Normally, this would be unsurprising, as we would expect embedding vectors to already cluster based on topic/semantic categories. But oddly enough, for this head, tokens do not attend to themselves. For example, the token `dog` will attend to other animals in the context, but it will not attend to itself or other instances of the token `dog`.
 
 This behavior is too specific to be an accident. This short research project aims to find the mechanistic explanation for this semantic grouping and self-avoidance, with the goal to develop useful techniques for analyzing attention patterns along the way.
 
-The Behaviour: Three Simple Rules
----------------------------------
-
+## The Behaviour: Three Simple Rules
 Before diving into the mechanistic analysis, let's establish exactly what GPT-2 head L1H5 is doing. After analyzing its attention patterns across hundreds of sequences, the behavior can be summarized by three rules:
+- **Semantic Clustering**: A token attends to other tokens in the sequence that belong to the same semantic category. Examples:
+    - `cat` attends to `dog` and `horse`, (animals)
+    - `red` attends to `blue`, `green` and `yellow`. (colours)
+    - `Monday` attends to `Tuesday` and `Friday`. (days of the week).
+- **Self-Suppression**: A token does **not** attend to itself, even when it appears multiple times in the sequence.
+- **Fallback to Beginning**: If no other token in the sequence belongs to the same semantic category, the token attends to the `<bos>` (beginning of sequence) token.
 
-*   **Semantic Clustering**: A token attends to other tokens in the sequence that belong to the same semantic category. Examples:
-    *   `cat` attends to `dog` and `horse`, (animals)
-    *   `red` attends to `blue`, `green` and `yellow`. (colours)
-    *   `Monday` attends to `Tuesday` and `Friday`. (days of the week).
-*   **Self-Suppression**: A token does **not** attend to itself, even when it appears multiple times in the sequence.
-*   **Fallback to Beginning**: If no other token in the sequence belongs to the same semantic category, the token attends to the `<bos>` (beginning of sequence) token.
+These rules hold remarkably consistently across different types of semantic categories, colours, months, days of the week, numbers, names, even verbs and logical operators. Broadly, the behaviour of this head as a semantic head was already mentioned in [We Inspected Every Head In GPT-2 Small using SAEs So You Don’t Have To](https://www.lesswrong.com/posts/S99qYp2cCYJ6Yg82G/we-inspected-every-head-in-gpt-2-small-using-saes-so-you "null"), but there it's only described as a "Succession or pairs related behavior".
 
-These rules hold remarkably consistently across different types of semantic categories, colours, months, days of the week, numbers, names, even verbs and logical operators. Broadly, the behaviour of this head as a semantic head was already mentioned in [We Inspected Every Head In GPT-2 Small using SAEs So You Don’t Have To](https://www.lesswrong.com/posts/xmegeW5mqiBsvoaim/we-inspected-every-head-in-gpt-2-small-using-saes-so-you-don), but there it's only described as a "Succession or pairs related behavior".
-
-Part 1: Finding What Matters
-----------------------------
-
+## Part 1: Finding What Matters
 First, we need to isolate this behavior and find the components responsible for it. This required a three-step process: design a prompt to reliably trigger the behavior, define a metric to measure it, and ablate components to see which ones break it.
 
-### Setup
+### The Setup
+To reliably trigger the head's behavior, we define a simple prompt by shuffling tokens from various hand-picked semantic categories. This creates a context where the head has many opportunities to demonstrate its preference for in-category attention.
 
-To reliably trigger the head's behavior, we define a simple prompt by shuffling tokens from various hand-picked semantic categories. This creates a context where L1H5 has many opportunities to demonstrate its preference for in-category attention.
-
-    <bos> blue sad cat purple purple 24 blue cat purple sheep 69 32 happy horse angry
-
-[![Attention Map](https://img.shields.io/badge/Viz-Attention%20map-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/attention_pattern.html)
+```
+<bos> blue sad cat purple purple 24 blue cat purple sheep 69 32 happy horse angry
+```
+ [![Viz](https://img.shields.io/badge/Viz-Attention%20map-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/attention_pattern.html)
 
 Based on the three rules observed above, we define an "expected" attention pattern for this prompt. For example, `purple` should attend to `blue`, but not to `cat` or `purple`. This gives us a target mask representing the idealized behavior of the head.
-
-![](https://39669.cdn.cke-cs.com/rQvD3VnunXZu34m86e5f/images/3f114a5290a7a3e1c2a31412229f65466d95f69a8667bf84.png)
-
-*Example of expected attention pattern.*
+![[expected_mask.png]]
+_Example of expected attention pattern._
 
 ### Semantic Category Score
+To measure how well the head's actual attention pattern, $A$, matches the expected pattern, $M$, we use a KL divergence-based score: $KL(\{1,0\} || \{P_q, 1 - P_q\})$ where $P_q=\sum_k (M\odot A)_{qk}$ is the probability mass of $q$ concentrated in $M$. The goal here is to measure how much of the attention probability mass is concentrated where the mask says it should be. This leads to the following loss function (credit to @David Quarel for the derivation):
 
-To measure how well the head's actual attention pattern, \\(A\\), matches the expected pattern, \\(M\\), we use a KL divergence-based score: \\(KL(\{1,0\} || \{P_q, 1 - P_q\})\\) where \\(P_q=\sum_k (M\odot A)_{qk}\\) is the probability mass of \\(q\\) concentrated in \\(M\\). The goal here is to measure how much of the attention probability mass is concentrated where the mask says it should be. This leads to the following loss function (credit to [@David Quarel](https://www.lesswrong.com/users/david-quarel?mention=user) for the derivation):
-
-\\\[\mathcal{L} = \frac{1}{|Q|}\sum_q - \log{\sum_k (M \odot A)_{qk}}\\\]
-
+$$
+\mathcal{L} = \frac{1}{|Q|}\sum_q - \log{\sum_k (M \odot A)_{qk}} 
+$$
 A **lower score means a better match**. As expected, a survey of all heads in the model shows that L1H5 is an outlier with a uniquely low score, confirming it's specialized for this task.
-
-![](https://39669.cdn.cke-cs.com/rQvD3VnunXZu34m86e5f/images/a249519b507d9364c1bfc3a6a21241cddb9042576a7a6231.png)
+![[surprisal.png]]
 
 +++ Loss derivation
 
-We define this metric as the distance from the expected behaviour described above. We encode the expected behaviour through the mask matrix \\(M\\), and define \\(P_q = \sum_k (M \odot A)_{qk}\\) as the amount of probability mass that the attention scores places on other tokens in the same semantic category. We can then measure the distance of \\(\{P_q, 1 - P_q\}\\) as the KL divergence from the ideal distribution \\(\{1,0\}\\) where all the probability mass is concentrated where we expect it to be. Then this derivation follows
+We define this metric as the distance from the expected behaviour described above. We encode the expected behaviour through the mask matrix $M$, and define $P_q = \sum_k (M \odot A)_{qk}$ as the amount of probability mass that the attention scores places on other tokens in the same semantic category. We can then measure the distance of $\{P_q, 1 - P_q\}$ as the KL divergence from the ideal distribution $\{1,0\}$ where all the probability mass is concentrated where we expect it to be. Then this derivation follows
 
-\\\[KL({1,0} || {P_q, 1 - P_q}) = 1 \cdot \ln \frac{1}{P_q} + 0 \cdot \ln \frac{0}{1 - P_q}\\\]\\\[= -\ln P_q\\\]\\\[= -\ln \left(\sum_k (M \odot A)_{qk}\right)\\\]
+$$
+\begin{align}
+KL(\{1,0\} || \{P_q, 1 - P_q\}) &= 1 \cdot \ln \frac{1}{P_q} + 0 \cdot \ln \frac{0}{1 - P_q} \\
+&= -\ln P_q \quad \quad \quad \quad \quad \quad\quad \text{Shannon Information} \\
+&= -\ln \left(\sum_k (M \odot A)_{qk}\right) \\
 
-A KL divergence between \\(\{1,0\}\\) and \\(\{P_q​,1−P_q​\}\\) devolves in \\(−\ln P_q\\)​. This is also called Shannon Information. We then take the average across all queries \\(q\\).
+\end{align}
 
+$$
 
-
+A KL divergence between $\{1,0\}$ and $\{P_q​,1−P_q​\}$ devolves in $−\ln P_q$​. This is also called Shannon Information. We then take the average across all queries $q$.
 
 +++
 
-### Component Importance
+### The Ablation
+With a reliable metric, we can perform a mean-ablation study[^4]. We systematically replace the output of each preceding component with its mean value and check whether the *Semantic Category Score* increases; if it does it means that the component is relevant for L1H5.
 
-With a reliable metric, we can perform a **mean-ablation study**[**^\[^**^2\]^](#fn-G4ZrTFQxNxyGPPeNo-2). We systematically replace the output of each preceding component with its mean value and **check whether the** ***Semantic Category Score*** **increases**; if it does it means that the component is relevant for L1H5.
+Surprisingly, 2 out of 4 components are completely irrelevant. The head's behaviour appears to be affected only by:
+- The token embedding matrix, $W_E$​.
+- The first MLP layer, $\texttt{MLP}_0$​.
+- The residual stream around the first MLP.
+![[component_importance.png]]
 
-Surprisingly, **2 out of 4 components are completely irrelevant**. The head's behaviour appears to be affected only by:
-
-*   The token embedding matrix, \\(W_E\\)​.
-*   The first MLP layer, \\(\texttt{MLP}_0\\)​.
-*   The residual stream around the first MLP.
-
-![](https://39669.cdn.cke-cs.com/rQvD3VnunXZu34m86e5f/images/2005633a1e1e66a7e0bfb8de040b5f0a006b6657c3035458.png)
-
-Interestingly, ablating the positional embeddings (\\(W_{pos}\\)​) and the previous attention layer (\\(\texttt{Attn}_0\\)) had almost no effect. This is a crucial clue: **L1H5 isn't using positional or sequential information to avoid attending to itself**. The self-suppression mechanism must be inherent to the token representations themselves, which in turn depend only on the embedding matrix (\\(W_E\\)) and the MLP.
-
-![](https://39669.cdn.cke-cs.com/rQvD3VnunXZu34m86e5f/images/289cf9cd6afa91b104e6e57c5392c0be8e7d93609b734c0f.png)
+Interestingly, ablating the positional embeddings ($W_{pos}$​) and the previous attention layer ($\texttt{Attn}_0$) had almost no effect. This is a crucial clue: **L1H5 isn't using positional or sequential information to avoid attending to itself**. The self-suppression mechanism must be inherent to the token representations themselves, which in turn depend only on the embedding matrix ($W_E$) and the MLP.
+![[component_ablation 1.png]]
 
 From this, we conclude that the essential input to L1H5 can be represented simply as:
-
-\\\[E = \texttt{MLP}_0(W_E) + W_E \quad \in \mathbb{R}^{|V|\times d}\\\]
-
+$$
+E = \texttt{MLP}_0(W_E) + W_E \quad \in \mathbb{R}^{|V|\times d}
+$$
 This matrix E contains a "processed" embedding for every token in the vocabulary, and it's all L1H5 needs to perform its function.
 
-Part 2: The World According to L1H5
------------------------------------
+## Part 2: The World According to L1H5
+Using this simplified input E, we can circumvent the rest of the network and compute a full token-to-token attention score matrix directly:
 
-Using this simplified input \\(E\\), we can circumvent the rest of the network and compute a **full token-to-token attention score** matrix directly:
+$$A_{tokens}​=Q K^T = (E W_Q) (​E W_K)^T = E\,\, W_Q ​W_K^T \,\,​ E^T$$
 
-\\\[A_{tokens}​=Q K^T = (E W_Q) (​E W_K)^T = E,, W_Q ​W_K^T ,,​ E^T\\\]
-
-Here, \\(W_{QK}​ = W_Q ​W_K^T\\)​ is the attention head's QK circuit. Visualizing this for selected semantic groups reveals the behaviour perfectly: high scores within a semantic block (e.g., colours attending to other colours) but low scores on the diagonal (a token attending to itself).
-
-![](https://39669.cdn.cke-cs.com/rQvD3VnunXZu34m86e5f/images/70bf08b9ed906aaef0d1db29f197b0d5e7319923363fe532.png)
-
-*Tokens attend to other semantically related tokens, but not themselves: Low diagonal values.*
+Here, $W_{QK}​ = W_Q ​W_K^T$​ is the attention head's QK circuit. Visualizing this for selected semantic groups reveals the behavior perfectly: high scores within a semantic block (e.g., colours attending to other colours) but low scores on the diagonal (a token attending to itself).
+![[token2token_attn.png]]
+_Tokens attend to other semantically related tokens, but not themselves (low diagonal values)._
 
 The head's semantic groupings are robust and intuitive, here we show the top 10 attended tokens for a sample of input tokens:
 
-| **Input Token** | **Top Attended Tokens** |
-| --- | --- |
-| `red` | Green, Blue, green, blue, \_green, Yellow, GREEN, \_blue, Green, White |
-| `69` | 72, 82, 70, 62, 71, 80, 68, 67, 66, 78 |
-| `Monday` | Wednesday, Tuesday, \_Wednesday, \_Tuesday, Friday, Tonight, _Friday, tonight, Tonight, tomorrow |
-| `Italy` | Iceland, Turkish, Pakistani, Auckland, Portugal, Guatemala, Zealand, Pakistan, Mexican, Chile |
-
-Again note that `red` doesn't attend to `red`, nor to same meaning tokens like `_red`, `RED`, `_Red`, etc...
-
+|                 |                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------- |
+| **Input Token** | **Top Attended Tokens**                                                                           |
+| `red`           | Green, Blue, green, blue, \_green, Yellow, GREEN, \_blue, Green, White                            |
+| `69`            | 72, 82, 70, 62, 71, 80, 68, 67, 66, 78                                                            |
+| `Monday`        | Wednesday, Tuesday, \_Wednesday, \_Tuesday, Friday, Tonight, \_Friday, tonight, Tonight, tomorrow |
+| `Italy`         | Iceland, Turkish, Pakistani, Auckland, Portugal, Guatemala, Zealand, Pakistan, Mexican, Chile     |
+Again note that `red` doesn't attend to `red`, nor to same meaning tokens like `_red`, `RED`, `_Red`, etc... 
 ### Clustering
-
-Using this attention map, we ran the Leiden community detection algorithm[^\[3\]^](#fn-G4ZrTFQxNxyGPPeNo-3) to **cluster the main 3000 tokens of English language**. The resulting clusters are surprisingly coherent and offer a fascinating glimpse into the "*world model*" of this specific head. You can explore this interactive map for yourself [here](https://mamiglia.github.io/deep-dive-L1H5)[^\[4\]^](#fn-G4ZrTFQxNxyGPPeNo-4).
+Using this attention map, we ran the Leiden community detection algorithm[^2] to cluster the main 3000 tokens of English language. The resulting clusters are surprisingly coherent and offer a fascinating glimpse into the "world model" of this specific head. You can explore this interactive map for yourself [here](https://mamiglia.github.io/feature-attn) .[^3]
 
 [![Viz](https://img.shields.io/badge/Viz-Clusters-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/)
-
+ 
 If you do you may note some interesting clusters:
-
-![](https://39669.cdn.cke-cs.com/rQvD3VnunXZu34m86e5f/images/6024e9d82bd894b0d6b86561c837ac902233dc8053a8f114.png)
+![[clusters.png]]
 
 Note also that tokens don't usually attend to themselves (or different versions of themselves). For example `east` doesn't attend to `East`, `Eastern`, `eastern`.
 
-Part 3: The Mechanism of Self-Suppression
------------------------------------------
+## Part 3: The Mechanism of Self-Suppression
+How does a single matrix, $W_{QK}$​, implement this complex behavior? Formally, for a query vector $x$, a similar vector $y$ (high cosine similarity), and a dissimilar vector $z$, we want:
 
-How does a single matrix, \\(W_{QK}\\)​, implement this complex behavior? Formally, for a query vector \\(x\\), a similar vector \\(y\\) (high cosine similarity), and a dissimilar vector \\(z\\), we want:
+$$x\,W_{QK}​\,y^T>x\,W_{QK}\,​x^T>x\,W_{QK}​\,z^T$$
 
-\\\[xW_{QK}​y^T > xW_{QK}​x^T > x W_{QK}​z^T\\\]
+To empirically verify this we can plot the average attention score obtained by a pair $x,y$ in L1H5 against their initial similarity. We can notice that the peak attention score is not at a similarity of 1, but below it, at circa 0.95, showing the head prefers tokens that are similar, but not identical.
 
-To empirically verify this we can plot the average attention score obtained by a pair \\(x,y\\) in L1H5 against their initial similarity. We can notice that the peak attention score is not at a similarity of 1, but below it, at circa 0.95, showing the head prefers tokens that are similar, but not identical.
-
-![](https://39669.cdn.cke-cs.com/rQvD3VnunXZu34m86e5f/images/fcdc8fcae5e608d731b76cb44ca022df7fd468af4afd784e.png)
-
-*Attention score between similar tokens. Note that most of the tokens have low similarity, so most of the mass concentrated between 0.6 and 0.9. Outside of that there is less data, thus more variability.*
+![[attn_over_similarity.png]]
+_Attention score between similar tokens. Note that most of the tokens have low similarity, so most of the mass concentrated between 0.6 and 0.9. Outside of that there is less data, thus more variability._
 
 ### Decomposing the Matrix
+To understand how $W_{QK}$​ works, we decompose it into its symmetric and skew-symmetric parts:
 
-To understand how \\(W_{QK}\\)​ works, we start by decomposing it into its symmetric and skew-symmetric parts:
+$$
+\begin{align} 
+W_{sym} &​= (W_{QK}​+W_{QK}^T​)/2 \\
+W_{skew​}&=(W_{QK}​−W_{QK}^T​)/2 \\
+W_{QK} &= W_{sym} + W_{skew}
 
-\\\[W_{sym} = (W_{QK}​+W_{QK}^T​)/2\\\]\\\[W_{skew​} =(W_{QK}​−W_{QK}^T​)/2\\\]\\\[W_{QK} = W_{sym} + W_{skew}\\\]
+\end{align}​$$
+This decomposition is useful because the skew-symmetric part always has zero contribution to self-attention ($x W_{skew​} x^T=0$).
 
-This decomposition is useful because the skew-symmetric part always has zero contribution to self-attention \\(x W_{skew​} x^T=0\\).
+When we test these components separately, the result is clear. The symmetric matrix, $W_{sym}$​, is able to reproduce the full behavior on its own: high off-diagonal attention within semantic blocks and low diagonal self-attention. The skew-symmetric part has a negligible effect.
 
-When we test these components separately, the result is clear. The symmetric matrix, \\(W_{sym}\\)​, is able to reproduce the full behavior on its own: high off-diagonal attention within semantic blocks and low diagonal self-attention. The skew-symmetric part has a negligible effect.
+![[base_sym_skew_attn.png]]
 
-![](https://39669.cdn.cke-cs.com/rQvD3VnunXZu34m86e5f/images/6a518abaaff6e8b0e9bfa84f398269a7bfce312881768378.png)
++++ About $W_{skew}$​
 
-+++ About \\(W_{skew}\\)​
+We note that the norm of attention scores produced by $W_{skew}​$ is significantly lower than the $W_{sym}​$, and its maximum singular value is comparatively lower than the then $W_{sym}​$ (1.3473 vs. 1.8611), indicating a smaller overall contribution to the final logits.
 
-We note that the norm of attention scores produced by \\(W_{skew}​\\) is significantly lower than the \\(W_{sym}​\\), and its maximum singular value is comparatively lower than the then \\(W_{sym}​\\) (1.3473 vs. 1.8611), indicating a smaller overall contribution to the final logits.
-
-While \\(W_{skew}​\\) might be involved in encoding ordering or sequence information, these observations suggest that its precise role in the self-suppression mechanism is minor, prompting us to primarily focus on \\(W_{sym}\\)​ for further investigation.
-
-
-
+While $W_{skew}​$ might be involved in encoding ordering or sequence information, these observations suggest that its precise role in the self-suppression mechanism is minor, prompting us to primarily focus on $W_{sym}$​ for further investigation.
 
 +++
-
 ### The Role of Eigenvalues
+So, the mystery is contained entirely within $W_{sym}$​, how does it suppress self-attention? 
+Let's start by decomposing $W_{sym}$ in its eigenvalues ($\lambda_i \in \mathbb{R}$) and eigenvectors ($p_i \in \mathbb{R}^d$), such that $W_{sym}​ = P\Lambda P^T$. For any symmetric matrix these values are going to be real. The attention score is then:
+$$x\,W_{sym}\,​x^T = \sum_i ​\lambda_i​(p_i^T​x)^2 $$
+If all eigenvalues $\lambda_i$​ were positive, this score would always be positive. A vector would achieve its highest score by aligning with the eigenvectors corresponding to the largest positive eigenvalues.
 
-So, the mystery is contained entirely within \\(W_{sym}\\)​, how does it suppress self-attention? Let's start by decomposing \\(W_{sym}\\) in its eigenvalues (\\(\lambda_i \in \mathbb{R}\\)) and eigenvectors (\\(p_i \in \mathbb{R}^d\\)), such that \\(W_{sym}​ = P\Lambda P^T\\). For any symmetric matrix these values are going to be real. The attention score is then:
+This leads to our central hypothesis: **self-suppression occurs when** $W_{sym}​$ **has negative eigenvalues.** If a vector $x$ has a significant projection onto an eigenvector $p_j$​ whose eigenvalue $\lambda_j$​ is negative, that component $\lambda_j ​(p_j^T ​x)^2$ will be negative, reducing the total score.
 
-\\\[x W_{sym} ​x^T = \sum_i ​\lambda_i​(p_i^T​x)^2\\\]
+> The head suppresses self-attention for a vector $x$ by having it align with "suppressive directions" $p_j$ in the space defined by $W_{sym}​$. 
 
-**If all eigenvalues **\\(\lambda_i\\)**​ were positive, this score would always be positive.** A vector would achieve its highest score by aligning with the eigenvectors corresponding to the largest positive eigenvalues.
+## Part 4: Validation by Steering
+Now that we know this we can try to elicit or remove this behaviour. First, we compute the 64 eigenvalues of $W_{sym}$​ and found that 33 of them are negative.
 
-This leads to our central hypothesis: **self-suppression occurs when** \\(W_{sym}​\\) **has negative eigenvalues.** If a vector \\(x\\) has a significant projection onto an eigenvector \\(p_j\\)​ whose eigenvalue \\(\lambda_j\\)​ is negative, that component \\(\lambda_j ​(p_j^T ​x)^2\\) will be negative, reducing the total score.
+Now we can control the behaviour by manipulating these eigenvalues. We define a steering mechanism to scale all negative eigenvalues by a factor $\alpha \in \mathbb{R}$.
+```
+# Decompose the symmetric matrix
+eigenvalues, eigenvectors = eigen_decomposition(W_sym)
 
-> The head suppresses self-attention for a vector \\(x\\) by having it align with "**suppressive directions**" \\(p_j\\) in the space defined by \\(W_{sym}​\\).
+# Scale the negative eigenvalues
+for i in range(len(eigenvalues)):
+    if eigenvalues[i] < 0:
+        eigenvalues[i] *= alpha
 
-Part 4: Validation by Steering
-------------------------------
+# Reconstruct the steered matrix
+W_steered = eigenvectors * diag(eigenvalues) * eigenvectors.T
 
-Now that we know this we can try to elicit or remove this behaviour. First, we compute the 64 eigenvalues of \\(W_{sym}\\)​ and find that 33 of them are negative.
+# Compute new attention map
+attn_map = E * W_steered * E.T
+```
 
-Now we can **control the behaviour by manipulating these eigenvalues**. We define a steering mechanism to scale all negative eigenvalues by a factor \\(\alpha \in \mathbb{R}\\).
+We scale negative eigenvalues by a parameter αα, reconstruct $W_{sym}$​, and recompute attention.
+- $\alpha < 1$ reduces self-suppression (self-attends more)
+- $\alpha > 1$ strengthens self-suppression.
 
-    # Decompose the symmetric matrix
-    eigenvalues, eigenvectors = eigen_decomposition(W_sym)
-    
-    # Scale the negative eigenvalues
-    for i in range(len(eigenvalues)):
-        if eigenvalues[i] < 0:
-            eigenvalues[i] *= alpha
-    
-    # Reconstruct the steered matrix
-    W_steered = eigenvectors * diag(eigenvalues) * eigenvectors.T
-    
-    # Compute new attention map
-    attn_map = E * W_steered * E.T
-    
+This gives direct causal control over whether tokens attend to themselves while preserving semantic clustering. As it can be seen by the plot below, when scaling $\alpha$ we can successfully steer the attention map, while also maintaining the similarity of semantically related tokens.
+![[steered_attn.png]]
 
-We scale negative eigenvalues by a parameter αα, reconstruct \\(W_{sym}\\)​, and recompute attention.
+## Conclusion
+This study offers a mechanistic account of gpt2-small attention head L1H5’s unusual behaviour. Its tendency to attend to semantically related tokens, while suppressing self-attention, appears to arise from a symmetric bilinear form with carefully placed negative eigenvalues. This effect seems to operate independently of position, relying only on transformed token embeddings. Decomposing the attention matrix and inspecting its spectrum suggests that negative eigenvalues play a key role in self-suppression. Moreover, this behavior can be steered by adjusting the spectrum, pointing to a possible causal link between spectral structure and function. These results add to our grasp of attention in LLMs and hopefully hint at new ways to interpret and steer their internal workings.
 
-*   \\(\alpha < 1\\) reduces self-suppression (self-attends more)
-*   \\(\alpha > 1\\) strengthens self-suppression.
+---
+[![Github](https://img.shields.io/badge/Github-deep--dive%20L1H5-ffffff?logo=github&style=for-the-badge&color=181717&logoColor=181717)](https://github.com/Mamiglia/deep-dive-L1H5)  [![Viz](https://img.shields.io/badge/Viz-Clusters-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/) [![Viz](https://img.shields.io/badge/Viz-Attention%20map-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/attention_pattern.html)
 
-This gives direct causal control over whether tokens attend to themselves while preserving semantic clustering. As it can be seen by the plot below, **when scaling **\\(\alpha\\)** we can successfully steer the attention map**, while also maintaining the similarity of semantically related tokens.
+[^1]: Layer 1, Head 5
 
-![](https://39669.cdn.cke-cs.com/rQvD3VnunXZu34m86e5f/images/15fc1ffe1404d2b693219a56a997dcc8c3166472659ea044.png)
+[^2]: https://en.wikipedia.org/wiki/Leiden_algorithm
 
-Scaling of negative eigenvalues by \\([1.1, 0, -0.5]\\). Note how the diagonal values become more intense as the alpha decreases. 
+[^3]: https://mamiglia.github.io/feature-attn
 
-Conclusion
-----------
-
-This study offers a mechanistic account of gpt2-small attention head L1H5’s unusual behaviour. Its tendency to attend to semantically related tokens, while suppressing self-attention, appears to **arise from a symmetric bilinear form with carefully placed negative eigenvalues**. This effect seems to operate independently of position, relying only on transformed token embeddings. Decomposing the attention matrix and inspecting its spectrum suggests that negative eigenvalues play a key role in self-suppression. Moreover, this behavior can be steered by adjusting the spectrum, pointing to a possible causal link between spectral structure and function. These results add to our grasp of attention in LLMs and hopefully hint at new ways to interpret and steer their internal workings.
-
-* * *
-
-[![Github](https://img.shields.io/badge/Github-deep--dive%20L1H5-ffffff?logo=github&style=for-the-badge&color=181717&logoColor=181717)](https://github.com/Mamiglia/deep-dive-L1H5) [![Viz](https://img.shields.io/badge/Viz-Clusters-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/) [![Viz](https://img.shields.io/badge/Viz-Attention%20map-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/attention_pattern.html)
-
-1.  Layer 1, Head 5 [↩︎](#fnref-G4ZrTFQxNxyGPPeNo-1)
-2.  An activation patching technique where the activations are replaced with their mean across tokens. [Glossary](https://www.neelnanda.io/mechanistic-interpretability/glossary#:~:text=Ablation%20aka%20Knockout), [How to use and interpret activation patching](https://arxiv.org/abs/2404.15255v1) [↩︎](#fnref-G4ZrTFQxNxyGPPeNo-2)
-3.  [https://en.wikipedia.org/wiki/Leiden_algorithm](https://en.wikipedia.org/wiki/Leiden_algorithm) [↩︎](#fnref-G4ZrTFQxNxyGPPeNo-3)
-4.  [https://mamiglia.github.io/deep-dive-L1H5](https://mamiglia.github.io/deep-dive-L1H5) [↩︎](#fnref-G4ZrTFQxNxyGPPeNo-4)
+[^4]: An activation patching technique where the activations are replaced with their mean across tokens. [Glossary](https://www.neelnanda.io/mechanistic-interpretability/glossary#:~:text=Ablation%20aka%20Knockout), [How to use and interpret activation patching](https://arxiv.org/abs/2404.15255v1)
