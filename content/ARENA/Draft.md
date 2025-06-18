@@ -34,7 +34,7 @@ To reliably trigger the head's behavior, I created a simple prompt by shuffling 
 ```
 <bos> blue sad cat purple purple 24 blue cat purple sheep 69 32 happy horse angry
 ```
-[View Attention Pattern](attention_pattern.html)
+[View Attention Pattern](https://mamiglia.github.io/feature-attn/attention_pattern.html)
 
 Based on the three rules observed above, I defined an "expected" attention pattern for this prompt. For example, `cat` should attend to `horse`, but not to `cat` or `blue`. This gives me a target mask representing the idealized behavior of the head.
 ![[expected_mask.png]]
