@@ -192,6 +192,9 @@ This gives direct causal control over whether tokens attend to themselves while 
 ## Conclusion
 This study offers a mechanistic account of gpt2-small attention head L1H5’s unusual behaviour. Its tendency to attend to semantically related tokens, while suppressing self-attention, appears to arise from a symmetric bilinear form with carefully placed negative eigenvalues. This effect seems to operate independently of position, relying only on transformed token embeddings. Decomposing the attention matrix and inspecting its spectrum suggests that negative eigenvalues play a key role in self-suppression. Moreover, this behavior can be steered by adjusting the spectrum, pointing to a possible causal link between spectral structure and function. These results add to our grasp of attention in LLMs and hopefully hint at new ways to interpret and steer their internal workings.
 
+---
+[![Github](https://img.shields.io/badge/Github-deep--dive%20L1H5-ffffff?logo=github&style=for-the-badge&color=181717&logoColor=181717)](https://github.com/Mamiglia/deep-dive-L1H5)  [![Viz](https://img.shields.io/badge/Viz-Clusters-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/) [![Viz](https://img.shields.io/badge/Viz-Attention%20map-ffffff?logo=graphql&style=for-the-badge&color=802433&logoColor=aa3243)](https://mamiglia.github.io/deep-dive-L1H5/attention_pattern.html)
+
 [^1]: Layer 1, Head 5
 
 [^2]: https://en.wikipedia.org/wiki/Leiden_algorithm
