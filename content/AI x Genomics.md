@@ -62,7 +62,7 @@ Top-5 Accuracy: 0.9130
 
 
 ## Jaccard
-
+Jaccard similarity between the historgrams.
 ```
 ==================================================
                RANKING METRICS REPORT
