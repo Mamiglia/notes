@@ -11,3 +11,5 @@ In particular we need:
 - a small portion of labeled data of the kind text-to-X
 
 Can we improve/develop T2X more than we can by just training on the labeled data?
+
+https://arxiv.org/abs/2106.07682
