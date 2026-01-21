@@ -1,10 +1,10 @@
 ---
-title: Untitled
-description: 
+title: Steering (IBM)
+description:
 date: 21/01/2026
 tags:
-  - unprocessed
-url:
+  - notes
+url: https://drive.google.com/drive/folders/1Ah1dvqCQpK7Pv4wr90JQYIa_5MBGkp29
 ---
 # Taxonomy
 Model outputs $y \sim p_\theta(x)$ can be steered in many different ways:
