@@ -1,9 +1,9 @@
 ---
-title: Untitled
-description: 
+title: Salad of Notes
+description:
 date: 21/01/2026
 tags:
-  - unprocessed
+  - notes
 url:
 ---
 ## Optimal Transport X ML
@@ -17,6 +17,8 @@ OT is very heavy to compute but recently things improved thanks to approximized 
 ## Model Reuse
 We can build an LLM router to use the best LLM for each subtask. This is quite difficult because even though we can train the router we need to (1) find an input signal that is consisitent (often it's sparse), while (2) need to update the router constantly for new models being added to the the model zoo.
 
-##
+## Formal Verification of Neural Networks
+There are ways of verifying whether a NN deployed in a critical environment will behave safely or not. Standard ways of verifying NNs is to evaluate them on a finite set of datapoints. Formal verification wants to make sure NNs are sure on **all possible inputs**, which is very hard. Usually you want to ensure properties like local robustness (invariance to noise), monotonicity. 
 
+The VNN is a way of comparing verification methods and evaluate their soundness, completeness, efficiency etc...
 
