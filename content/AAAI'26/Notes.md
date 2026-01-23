@@ -22,3 +22,6 @@ There are ways of verifying whether a NN deployed in a critical environment will
 
 The VNN is a way of comparing verification methods and evaluate their soundness, completeness, efficiency etc...
 
+## Training free unlocking of reasoning
+with steering toward "reasoning mode"
+
