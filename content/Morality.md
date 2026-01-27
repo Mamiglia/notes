@@ -16,4 +16,7 @@ eg. Consitutional AI
 
 
 
+# Ethics
+You need to plug some "ethic rules" in the machine (agent) to direct it toward ethical choices. But hwo to? We first need to formalize these rules into a set of statements. Also what  
+
 
